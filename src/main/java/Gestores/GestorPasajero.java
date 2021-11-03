@@ -13,6 +13,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GestorPasajero {
     private static GestorPasajero instanciaGPasajero = null;
@@ -99,22 +101,29 @@ public class GestorPasajero {
         if(datosPasajero.getNacionalidad().equals("Seleccionar")){
             bandGestor = false;
         }
-        
+            
         return bandGestor;
-        
     }
     
     //Verificar si existe un pasajero con mismo tipoDoc y numDoc
-    public boolean verificarExistenciaPasajero(String tipoDoc, String numDoc){
+    public boolean verificarExistenciaPasajero(PasajeroDTO pasajeroDTO){
         Boolean existe = false;
         
         pasajeroDAO = new PasajeroDAOImpl();
         try {
-            existe = pasajeroDAO.verificarExistenciaPasajero(tipoDoc,numDoc);
+            existe = pasajeroDAO.verificarExistenciaPasajero(pasajeroDTO.getTipoDoc().name(),pasajeroDTO.getNumDoc());
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-
+        
+        if(!existe){
+            try {
+                crearPasajero(pasajeroDTO);
+            } catch (ParseException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
         return existe;
     }
     

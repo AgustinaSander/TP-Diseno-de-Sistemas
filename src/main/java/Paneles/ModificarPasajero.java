@@ -21,8 +21,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 
 public class ModificarPasajero extends javax.swing.JDialog {
-
+    //Pasajero seleccionado
     Pasajero pasajero;
+    
     public ModificarPasajero(java.awt.Frame parent, boolean modal, Pasajero pasajero) {
         super(parent, modal);
         initComponents();
@@ -779,10 +780,8 @@ public class ModificarPasajero extends javax.swing.JDialog {
             //Si cambiaron el tipo de documento o el numero de documento verificamos si ya existe un pasajero
             Boolean existePasajero = false;
             if(!pasajero.getTipoDoc().name().equals(pasajeroDTO.getTipoDoc().name()) || !pasajero.getNumDoc().equals(pasajeroDTO.getNumDoc())){
-                existePasajero = getInstancePasajero().verificarExistenciaPasajero(pasajeroDTO.getTipoDoc().name(), pasajeroDTO.getNumDoc());
+                existePasajero = getInstancePasajero().verificarExistenciaPasajero(pasajeroDTO);
             }
-            
-            Boolean vaciarCampos = false;
             
             if(existePasajero){
                 Object[] opciones = {"Corregir","Aceptar Igualmente"};
@@ -862,7 +861,6 @@ public class ModificarPasajero extends javax.swing.JDialog {
         Direccion dir = pasajero.getDireccion();
         dir.setIdDireccion(idDireccion);
         pasajero.setDireccion(dir);
-        
     }
     
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed

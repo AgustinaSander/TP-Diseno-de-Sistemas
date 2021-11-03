@@ -240,12 +240,14 @@ public class GestionarPasajero extends javax.swing.JDialog {
         resPasajeros = getInstancePasajero().buscarPasajeros(busquedaDTO);
         DefaultTableModel tabla = (DefaultTableModel) resultadosTabla.getModel();
         tabla.setRowCount(0);
+        //Si no hay resultados
         if(resPasajeros.isEmpty()){
             JOptionPane.showMessageDialog(this, "No existen pasajeros que coincidan con los criterios de busqueda.", "Pasajero no encontrado",JOptionPane.ERROR_MESSAGE);
             this.dispose();
             new AltaPasajero(null,true).setVisible(true);
         }
         else{
+            //Completo la tabla con los pasajeros encontrados
             for(Pasajero pas : resPasajeros){
                 tabla.addRow(new Object[]{pas.getApellido(),pas.getNombre(),pas.getTipoDoc(),pas.getNumDoc()});
             }

@@ -11,6 +11,8 @@ import java.awt.Color;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 
@@ -652,12 +654,18 @@ public class AltaPasajero extends javax.swing.JDialog {
             else{
                 nacionalidadCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
+            
+            //Mostramos el mensaje de error
+            String mensaje = "";
+            for(String m : mensajesError){
+                mensaje +="- "+ m + "\n";
+            }
+            JOptionPane.showMessageDialog(this, mensaje, "Error al completar los datos",JOptionPane.ERROR_MESSAGE);
         }
         
         if(bandInterfaz){
             //No hay errores por lo que procedemos a verificar si hay un pasajero con mismo dni
-            boolean existePasajero = getInstancePasajero().verificarExistenciaPasajero(pasajeroDTO.getTipoDoc().name(), pasajeroDTO.getNumDoc());
-            Boolean vaciarCampos = false;
+            boolean existePasajero = getInstancePasajero().verificarExistenciaPasajero(pasajeroDTO);
             
             if(existePasajero){
                 Object[] opciones = {"Corregir","Aceptar Igualmente"};
@@ -666,80 +674,57 @@ public class AltaPasajero extends javax.swing.JDialog {
                 //Hay pasajero con mismo dni pero se quiere guardar igual
                 if(confirmacion != JOptionPane.OK_OPTION){
                     //GUARDAR PASAJERO
-                    //Pasamos los datos al gestor pasajero para que invoque al metodo crearPasajero
-                    
-                    Boolean pasajeroCreado = false;
-                    
-                    try {
-                        //Llamo al metodo crearPasajero del gestor pasajeros
-                        pasajeroCreado = getInstancePasajero().crearPasajero(pasajeroDTO);
-                    } catch (ParseException ex) {
-                        ex.printStackTrace(System.out);
-                    }
-
-                    //Mostrar el cartel solo si se creo el pasajero exitosamente
-                    if(pasajeroCreado){
-                        Object [] opciones2 = {"SI","NO"};
-                        confirmacion = JOptionPane.showOptionDialog(this, "El pasajero "+nombreField.getText()+" "+apellidoField.getText()+" ha sido satisfactoriamente cargado al sistema.\n¿Desea cargar otro?","Carga Exitosa",JOptionPane.YES_NO_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones2,null);
-                        if(confirmacion != JOptionPane.OK_OPTION){
-                            //No se quieren cargar mas pasajeros, se cierra la interfaz
-                            this.dispose();
-                        }
-                        else{
-                            //Se desea cargar otro pasajero por lo que se vacian los campos
-                            vaciarCampos = true;
-                        }
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(this, "No se ha podido crear el pasajero","Error en creacion",JOptionPane.ERROR_MESSAGE);
-                    }
+                    guardarPasajero(pasajeroDTO);
                 }
             }
             else{
-                //No hay pasajero con mismo dni por lo que se procede a guardarlo
-                //GUARDAR PASAJERO
-                //Pasamos los datos al gestor pasajero para que invoque al metodo crearPasajero
-                Boolean pasajeroCreado = false;
-                try {
-                    //Llamo al metodo crearPasajero del gestor pasajeros
-                    pasajeroCreado = getInstancePasajero().crearPasajero(pasajeroDTO);
-                } catch (ParseException ex) {
-                    ex.printStackTrace(System.out);
-                }
-
-                //Mostrar el cartel solo si se creo el pasajero exitosamente
-                if(pasajeroCreado){
-                    Object [] opciones2 = {"SI","NO"};
-                    int confirmacion = JOptionPane.showOptionDialog(this, "El pasajero "+ pasajeroDTO.getNombre() +" "+ pasajeroDTO.getApellido() +" ha sido satisfactoriamente cargado al sistema.\n¿Desea cargar otro?","Carga Exitosa",JOptionPane.YES_NO_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones2,null);
-                    if(confirmacion != JOptionPane.OK_OPTION){
-                        //No se quieren cargar mas pasajeros, se cierra la interfaz
-                        this.dispose();
-                    }
-                    else{
-                        //Se desea cargar otro pasajero por lo que se vacian los campos
-                        vaciarCampos = true;
-                    }
+                //No hay pasajero con mismo dni por lo que el gestor ya guardo el pasajero
+                //Se muestran los mensajes de exito
+                
+                Object [] opciones2 = {"SI","NO"};
+                int confirmacion = JOptionPane.showOptionDialog(this, "El pasajero "+ pasajeroDTO.getNombre() +" "+ pasajeroDTO.getApellido() +" ha sido satisfactoriamente cargado al sistema.\n¿Desea cargar otro?","Carga Exitosa",JOptionPane.YES_NO_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones2,null);
+                if(confirmacion != JOptionPane.OK_OPTION){
+                    //No se quieren cargar mas pasajeros, se cierra la interfaz
+                    this.dispose();
                 }
                 else{
-                    JOptionPane.showMessageDialog(this, "No se ha podido crear el pasajero","Error en creacion",JOptionPane.ERROR_MESSAGE);
+                    //Se desea cargar otro pasajero por lo que se vacian los campos
+                    vaciarCampos();
                 }
             }
-            
-            if(vaciarCampos){
-                vaciarCampos();
-            }
-        }
-        else{
-            String mensaje = "";
-            for(String m : mensajesError){
-                mensaje +="- "+ m + "\n";
-            }
-            JOptionPane.showMessageDialog(this, mensaje, "Error al completar los datos",JOptionPane.ERROR_MESSAGE);
-
         }
 
     }//GEN-LAST:event_siguienteBtnActionPerformed
 
+    private void guardarPasajero(PasajeroDTO pasajeroDTO){
+        //Pasamos los datos al gestor pasajero para que invoque al metodo crearPasajero
+        Boolean pasajeroCreado = false;
+                
+        try {
+            //Llamo al metodo crearPasajero del gestor pasajeros
+            pasajeroCreado = getInstancePasajero().crearPasajero(pasajeroDTO);
+        } catch (ParseException ex) {
+            ex.printStackTrace(System.out);
+        }
+
+        //Mostrar el cartel solo si se creo el pasajero exitosamente
+        if(pasajeroCreado){
+            Object [] opciones2 = {"SI","NO"};
+            int confirmacion = JOptionPane.showOptionDialog(this, "El pasajero "+ pasajeroDTO.getNombre() +" "+ pasajeroDTO.getApellido() +" ha sido satisfactoriamente cargado al sistema.\n¿Desea cargar otro?","Carga Exitosa",JOptionPane.YES_NO_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones2,null);
+            if(confirmacion != JOptionPane.OK_OPTION){
+                //No se quieren cargar mas pasajeros, se cierra la interfaz
+                this.dispose();
+            }
+            else{
+                //Se desea cargar otro pasajero por lo que se vacian los campos
+                vaciarCampos();
+            }
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "No se ha podido crear el pasajero","Error en creacion",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
         Object[] opciones = {"SI","NO"};
         int confirmacion = JOptionPane.showOptionDialog(this, "¿Desea cancelar el alta del pasajero?","Cancelar carga",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE, null,opciones,null);
@@ -860,6 +845,21 @@ public class AltaPasajero extends javax.swing.JDialog {
         emailField.setText("");
         ocupacionField.setText("");
         posIVACombo.setSelectedItem("CONSUMIDOR_FINAL");
+        nombreField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        apellidoField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        numDocField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        CUITField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        fechaNacField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        calleField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        numeroField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        deptoField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        codigoPostalField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        localidadCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        provinciaCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        telefonoField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        emailField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        ocupacionField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        nacionalidadCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
     }
         
    
