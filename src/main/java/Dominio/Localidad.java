@@ -5,6 +5,10 @@ public class Localidad {
     private Provincia provincia;
     private String nombreLocalidad;
 
+    public Localidad(int idLocalidad) {
+        this.idLocalidad = idLocalidad;
+    }
+
     public Localidad(int idLocalidad, Provincia provincia, String nombreLocalidad) {
         this.idLocalidad = idLocalidad;
         this.provincia = provincia;

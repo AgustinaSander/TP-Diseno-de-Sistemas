@@ -3,18 +3,49 @@ package Dominio;
 
 import Enum.TipoDocumento;
 
-public class BusquedaDTO {
+public class GestionarPasajeroDTO {
+    private int id;
+    private int idDireccion;
     private String nombre;
     private String apellido;
     private TipoDocumento tipoDoc;
     private String numDoc;
 
-    public BusquedaDTO(String nombre, String apellido, TipoDocumento tipoDoc, String numDoc) {
+    public GestionarPasajeroDTO() {
+    }
+
+    public GestionarPasajeroDTO(String nombre, String apellido, TipoDocumento tipoDoc, String numDoc) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.tipoDoc = tipoDoc;
         this.numDoc = numDoc;
     }
+
+    public GestionarPasajeroDTO(int id, int idDireccion, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc) {
+        this.id = id;
+        this.idDireccion = idDireccion;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getIdDireccion() {
+        return idDireccion;
+    }
+
+    public void setIdDireccion(int idDireccion) {
+        this.idDireccion = idDireccion;
+    }
+    
 
     public String getNombre() {
         return nombre;

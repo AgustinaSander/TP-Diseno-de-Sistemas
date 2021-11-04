@@ -1,7 +1,7 @@
 
 package Paneles;
 
-import Dominio.BusquedaDTO;
+import Dominio.GestionarPasajeroDTO;
 import Dominio.Pasajero;
 import Enum.TipoDocumento;
 import static Gestores.GestorPasajero.*;
@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class GestionarPasajero extends javax.swing.JDialog {
-    private List<Pasajero> resPasajeros = null;
+    private List<GestionarPasajeroDTO> resPasajeros = null;
     
     public GestionarPasajero(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -233,8 +233,8 @@ public class GestionarPasajero extends javax.swing.JDialog {
         if(!"Seleccionar".equals(String.valueOf(tipoDocCombo.getSelectedItem()))) 
             tipoDoc = TipoDocumento.valueOf(String.valueOf(tipoDocCombo.getSelectedItem()));
         
-        //Creo un objeto BusquedaDTO con los campos que se deben completar
-        BusquedaDTO busquedaDTO = new BusquedaDTO(nombreField.getText(), apellidoField.getText(),tipoDoc ,numDocField.getText());
+        //Creo un objeto GestionarPasajeroDTO con los campos que se deben completar
+        GestionarPasajeroDTO busquedaDTO = new GestionarPasajeroDTO(nombreField.getText(), apellidoField.getText(),tipoDoc ,numDocField.getText());
         
         //El gestor de pasajeros realiza la busqueda 
         resPasajeros = getInstancePasajero().buscarPasajeros(busquedaDTO);
@@ -248,7 +248,7 @@ public class GestionarPasajero extends javax.swing.JDialog {
         }
         else{
             //Completo la tabla con los pasajeros encontrados
-            for(Pasajero pas : resPasajeros){
+            for(GestionarPasajeroDTO pas : resPasajeros){
                 tabla.addRow(new Object[]{pas.getApellido(),pas.getNombre(),pas.getTipoDoc(),pas.getNumDoc()});
             }
         }

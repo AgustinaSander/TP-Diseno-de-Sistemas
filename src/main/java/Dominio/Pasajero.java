@@ -30,7 +30,7 @@ public class Pasajero extends Persona{
         this.nacionalidad = nacionalidad;
     }
 
-    public Pasajero(int idPersona, String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, String ocupacion, Pais nacionalidad) {
+    public Pasajero(int idPersona, String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, String ocupacion) {
         super(idPersona);
         this.apellido = apellido;
         this.nombre = nombre;
@@ -39,7 +39,17 @@ public class Pasajero extends Persona{
         this.fechaNac = fechaNac;
         this.email = email;
         this.ocupacion = ocupacion;
-        this.nacionalidad = nacionalidad;
+    }
+
+    public Pasajero(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc,  Date fechaNac, String email, String ocupacion, String CUIT, PosicionIVA posIva, String telefono) {
+        super(CUIT, posIva, telefono);
+        this.apellido = apellido;
+        this.nombre = nombre;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+        this.fechaNac = fechaNac;
+        this.email = email;
+        this.ocupacion = ocupacion;
     }
 
     public String getApellido() {

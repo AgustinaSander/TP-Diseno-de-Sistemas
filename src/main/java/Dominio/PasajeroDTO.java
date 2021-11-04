@@ -24,6 +24,8 @@ public class PasajeroDTO {
     private String numero;
     private String departamento;
     private String codigoPostal;
+    private int idPersona;
+    private int idDireccion;
 
     public PasajeroDTO(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, String ocupacion, String nacionalidad, String CUIT, PosicionIVA posIva, String telefono, String pais, String provincia, String localidad, String calle, String numero, String departamento, String codigoPostal) {
         this.apellido = apellido;
@@ -44,6 +46,22 @@ public class PasajeroDTO {
         this.numero = numero;
         this.departamento = departamento;
         this.codigoPostal = codigoPostal;
+    }
+
+    public int getIdPersona() {
+        return idPersona;
+    }
+
+    public void setIdPersona(int idPersona) {
+        this.idPersona = idPersona;
+    }
+
+    public int getIdDireccion() {
+        return idDireccion;
+    }
+
+    public void setIdDireccion(int idDireccion) {
+        this.idDireccion = idDireccion;
     }
 
     public String getApellido() {

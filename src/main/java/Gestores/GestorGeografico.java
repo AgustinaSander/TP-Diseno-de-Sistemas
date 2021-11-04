@@ -107,7 +107,4 @@ public class GestorGeografico {
         return idLocalidad;
     }
     
-    /*public Direccion crearObjetoDireccion(PasajeroDTO pasajeroDTO){
-        
-    }*/
 }

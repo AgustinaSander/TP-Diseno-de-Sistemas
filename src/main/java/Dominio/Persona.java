@@ -3,14 +3,21 @@ package Dominio;
 
 import Enum.PosicionIVA;
 
-public class Persona {
+public abstract class Persona {
     protected int idPersona;
     protected String CUIT;
     protected PosicionIVA posIva;
     protected String telefono;
     protected Direccion direccion;
     
+    //Por mas de que no pueda usar los constructores para instanciar la clase abstracta, los necesito para que sus clases hijas los utilicen
     public Persona(){
+    }
+
+    public Persona(String CUIT, PosicionIVA posIva, String telefono) {
+        this.CUIT = CUIT;
+        this.posIva = posIva;
+        this.telefono = telefono;
     }
 
     public Persona(int idPersona) {

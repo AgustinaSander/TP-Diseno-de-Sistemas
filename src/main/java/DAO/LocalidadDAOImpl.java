@@ -61,7 +61,7 @@ public class LocalidadDAOImpl implements ILocalidadDAO{
             //Si necesito aplicar transacciones
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
-            stmt = conn.prepareStatement("SELECT id FROM localidades WHERE localidad = ?");
+            stmt = conn.prepareStatement("SELECT id FROM localidad WHERE localidad = ?");
             stmt.setString(1,nombre);
             rs = stmt.executeQuery();
             

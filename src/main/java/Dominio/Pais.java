@@ -9,6 +9,10 @@ public class Pais {
     public Pais() {
     }
 
+    public Pais(int idPais) {
+        this.idPais = idPais;
+    }
+
     public Pais(int idPais, String nombrePais, String nacionalidad) {
         this.idPais = idPais;
         this.nombrePais = nombrePais;

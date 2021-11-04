@@ -62,9 +62,8 @@ public class ProvinciaDAOImpl implements IProvinciaDAO{
            
             //Obtengo el idProvincia
             int idProvincia = obtenerIdProvincia(provincia);
-            
             //Obtengo la lista de localidades de esa provincia
-            stmt = conn.prepareStatement("SELECT localidad FROM localidades WHERE id_provincia = ?");
+            stmt = conn.prepareStatement("SELECT localidad FROM localidad WHERE id_provincia = ?");
             stmt.setInt(1,idProvincia);
             rs = stmt.executeQuery();
             while(rs.next()){

@@ -8,7 +8,6 @@ import Enum.TipoDocumento;
 import java.sql.*;
 import java.util.*;
 
-
 public class PasajeroDAOImpl implements IPasajeroDAO{
     //Si necesito aplicar transacciones
     private Connection conexionTransaccional;
@@ -144,14 +143,14 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
     }
     
     @Override
-    //Obtengo todos los pasajeros que coinciden con los datos del objeto BusquedaDTO
-    public ArrayList<Pasajero> obtenerPasajeros(BusquedaDTO busquedaDTO) throws SQLException{
-        ArrayList <Pasajero> resPasajeros = new ArrayList<>();
+    //Obtengo todos los pasajeros que coinciden con los datos del objeto GestionarPasajeroDTO
+    public List<GestionarPasajeroDTO> obtenerPasajeros(GestionarPasajeroDTO busquedaDTO) throws SQLException{
+        List <GestionarPasajeroDTO> resPasajeros = new ArrayList<>();
         
         try {
             conn = getConnection();
            
-            stmt = conn.prepareStatement("SELECT * FROM pasajero AS pas, persona AS per, direccion AS dir, localidades as l, estado as e, pais AS p WHERE ((? is null) or (? = pas.apellido)) AND ((? is null) or (? = pas.nombre)) AND ((? is null) or (? = pas.tipoDoc)) AND ((? is null) or (? = pas.numDoc)) AND pas.idPersona = per.idPersona AND per.idDireccion = dir.idDireccion AND dir.idLocalidad = l.id AND l.id_provincia = e.id AND e.ubicacionpaisid = p.id;");
+            stmt = conn.prepareStatement("SELECT pasajero.idPersona,idDireccion,apellido,nombre,tipoDoc,numDoc FROM pasajero, persona WHERE ((? is null) or (? = apellido)) AND ((? is null) or (? = nombre)) AND ((? is null) or (? = tipoDoc)) AND ((? is null) or (? = numDoc)) AND pasajero.idPersona = persona.idPersona;");
             stmt.setString(1,busquedaDTO.getApellido());
             stmt.setString(2,busquedaDTO.getApellido());
             stmt.setString(3,busquedaDTO.getNombre());
@@ -161,34 +160,11 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             stmt.setString(7,busquedaDTO.getNumDoc());
             stmt.setString(8,busquedaDTO.getNumDoc());
             rs = stmt.executeQuery();
-            Pasajero pas = null;
+            GestionarPasajeroDTO pas = null;
             while(rs.next()){                
-                //Creo el objeto pasajero
-                //Obtengo el objeto pais
-                Pais pais = new Pais(rs.getInt("idPais"),rs.getString("paisnombre"),rs.getString("nacionalidad"));
-
-                //Obtengo el objeto provincia
-                Provincia provincia = new Provincia(rs.getInt("id_provincia"), pais, rs.getString("estadonombre"));
-                
-                //Obtengo el objeto localidad
-                Localidad localidad = new Localidad(rs.getInt("idLocalidad"),provincia, rs.getString("localidad"));
-                
-                //Obtengo el objeto pais para la nacionalidad
-                stmt = conn.prepareStatement("SELECT pais.* FROM pasajero, pais WHERE pasajero.idPersona = ? AND pais.id = pasajero.idPais ");
-                stmt.setInt(1, rs.getInt("idPersona"));
-                ResultSet rsAux = stmt.executeQuery();
-                Pais nacionalidad = new Pais();        
-                while(rsAux.next()){
-                    nacionalidad.setIdPais(rsAux.getInt("id"));
-                    nacionalidad.setNacionalidad(rsAux.getString("nacionalidad"));
-                    nacionalidad.setNombrePais(rsAux.getString("paisnombre"));
-                }
-                
-                //Obtengo el objeto direccion
-                Direccion direccion = new Direccion(rs.getInt("idDireccion"),localidad,rs.getString("calle"),rs.getInt("numero"),rs.getString("departamento"),rs.getInt("codigoPostal"));
-                
-                
-                pas = new Pasajero(rs.getString("apellido"),rs.getString("nombre"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"),new java.util.Date(rs.getDate("fechaNac").getTime()),rs.getString("email"),rs.getString("ocupacion"),nacionalidad,rs.getInt("idPersona"),rs.getString("CUIT"),PosicionIVA.valueOf(rs.getString("posIVA")), rs.getString("telefono"),direccion);
+                //Creo el objeto GestionarPasajeroDTO
+                //int id, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc
+                pas = new GestionarPasajeroDTO(rs.getInt("idPersona"), rs.getInt("idDireccion"), rs.getString("nombre"),rs.getString("apellido"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"));
                 resPasajeros.add(pas);
                 
             }
@@ -263,4 +239,48 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
         }
     }
     
+    //Obtengo el objeto pasajero a partir del id de la persona
+    @Override
+    public Pasajero obtenerPasajero(int idPasajero){
+        Pasajero pas = null;
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement("SELECT pas.*, per.*, dir.*, l.id AS idLocalidad, l.*, e.id AS idProvincia, e.*, p.*, nac.id AS idNacionalidad, nac.paisnombre AS paisNacionalidad, nac.nacionalidad AS nacionalidadNacionalidad FROM pasajero AS pas, persona AS per, direccion AS dir, localidad as l, estado as e, pais AS p, pais AS nac WHERE pas.idPersona = ? AND pas.idPersona = per.idPersona AND pas.idPais = nac.id AND per.idDireccion = dir.idDireccion AND dir.idLocalidad = l.id AND l.id_provincia = e.id AND e.ubicacionpaisid = p.id");
+            stmt.setInt(1,idPasajero);
+            rs = stmt.executeQuery();
+            while(rs.next()){                
+                //Creo el objeto pasajero
+                //Obtengo el objeto pais
+                Pais pais = new Pais(rs.getInt("idPais"),rs.getString("paisnombre"),rs.getString("nacionalidad"));
+            
+                //Obtengo el objeto provincia
+                Provincia provincia = new Provincia(rs.getInt("id_provincia"), pais, rs.getString("estadonombre"));
+
+                //Obtengo el objeto localidad
+                Localidad localidad = new Localidad(rs.getInt("idLocalidad"),provincia, rs.getString("localidad"));
+
+                //Obtengo el objeto pais para la nacionalidad
+                Pais nacionalidad = new Pais(rs.getInt("idNacionalidad"), rs.getString("paisNacionalidad"),rs.getString("nacionalidadNacionalidad"));        
+
+                //Obtengo el objeto direccion
+                Direccion direccion = new Direccion(rs.getInt("idDireccion"),localidad,rs.getString("calle"),rs.getInt("numero"),rs.getString("departamento"),rs.getInt("codigoPostal"));
+
+
+                pas = new Pasajero(rs.getString("apellido"),rs.getString("nombre"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"),new java.util.Date(rs.getDate("fechaNac").getTime()),rs.getString("email"),rs.getString("ocupacion"),nacionalidad,rs.getInt("idPersona"),rs.getString("CUIT"),PosicionIVA.valueOf(rs.getString("posIVA")), rs.getString("telefono"),direccion);
+           
+            }
+        } catch (SQLException ex) {
+             ex.printStackTrace(System.out);
+        }
+        finally{
+            try {
+                close(stmt);
+                close(rs);
+                close(conn);
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        return pas;
+    }
 }

@@ -1,6 +1,7 @@
 
 package Paneles;
 
+import Dominio.CamposAltaPasajero;
 import Dominio.PasajeroDTO;
 import Enum.PosicionIVA;
 import Enum.TipoDocumento;
@@ -472,59 +473,53 @@ public class AltaPasajero extends javax.swing.JDialog {
         PasajeroDTO pasajeroDTO = new PasajeroDTO(apellidoField.getText(), nombreField.getText(), TipoDocumento.valueOf(String.valueOf(tipoDocCombo.getSelectedItem())), numDocField.getText(), fechaNacField.getDate(), emailField.getText(), ocupacionField.getText(), String.valueOf(nacionalidadCombo.getSelectedItem()), CUITField.getText(), PosicionIVA.valueOf(String.valueOf(posIVACombo.getSelectedItem())), telefonoField.getText(), String.valueOf(paisCombo.getSelectedItem()), String.valueOf(provinciaCombo.getSelectedItem()), String.valueOf(localidadCombo.getSelectedItem()), calleField.getText(), numeroField.getText(), deptoField.getText(), codigoPostalField.getText());
         
         //El gestor valida los datos ingresados y devuelve un booleano con el resultado
-        Boolean bandGestor = getInstancePasajero().validarDatosPasajero(pasajeroDTO);
+        CamposAltaPasajero validacionesCampos = getInstancePasajero().validarDatosPasajero(pasajeroDTO);
         
         //Si hay datos incorrectos se procede a validar nuevamente los datos obteniendo los mensajes de error
-        Boolean bandInterfaz = true;
+        
         List<String> mensajesError = new ArrayList();
-        if(!bandGestor){
-            
+        if(!validacionesCampos.getValidos()){  
             //Se validan todos los campos con expresiones regulares
             String errorLargo = "Error en longitud del campo ?. Debe tener como minimo ? caracteres y como maximo ?.";
             String errorSeleccion = "Error en campo ?. Seleccione un valor.";
 
-
-            if(pasajeroDTO.getNombre().length() > 50 || pasajeroDTO.getNombre().length() == 0){
+            if(!validacionesCampos.getNombreValido()){
                 nombreField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Nombre");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","50");
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 nombreField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getApellido().length() > 50 || pasajeroDTO.getApellido().length() == 0){
+            if(!validacionesCampos.getApellidoValido()){
                 apellidoField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Apellido");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","50");
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 apellidoField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getNumDoc().length() > 10 || pasajeroDTO.getNumDoc().length() == 0){
+            if(!validacionesCampos.getNumDocValido()){
                 numDocField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Numero de Documento");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","10");
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 numDocField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getCUIT().length() > 15 || !verificarCUIT(pasajeroDTO.getCUIT())){
+            if(!validacionesCampos.getCUITValido()){
                 CUITField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = "Error en el campo CUIT. Debe tener como maximo 15 caracteres.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 CUITField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -538,118 +533,107 @@ public class AltaPasajero extends javax.swing.JDialog {
                 ex.printStackTrace(System.out);
             }
 
-            if(pasajeroDTO.getFechaNac()== null ||pasajeroDTO.getFechaNac().after(new Date()) || pasajeroDTO.getFechaNac().before(fechaMin)){
+            if(!validacionesCampos.getFechaNacValido()){
                 fechaNacField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = "Error en campo Fecha de Nacimiento. Es un campo obligatorio y su valor debe estar entre 01/01/1870 y el dia de hoy.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 fechaNacField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getCalle().length() > 50 || pasajeroDTO.getCalle().length() == 0){
+            if(!validacionesCampos.getCalleValido()){
                 calleField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Calle");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","50");
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 calleField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getNumero().length() > 10 || pasajeroDTO.getNumero().length() == 0 || !esNumero(pasajeroDTO.getNumero())){
+            if(!validacionesCampos.getNumeroValido()){
                 numeroField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Numero");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","10");
                 error += " Debe ser un numero.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 numeroField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getDepartamento().length() > 15){
+            if(!validacionesCampos.getDepartamentoValido()){
                 deptoField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = "Error en el campo Depto/Piso. Debe tener como maximo 15 caracteres.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 deptoField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getCodigoPostal().length() > 5 || pasajeroDTO.getCodigoPostal().length() == 0 || !esNumero(pasajeroDTO.getCodigoPostal())){
+            if(!validacionesCampos.getCodigoPostalValido()){
                 codigoPostalField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Codigo Postal");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","5");
                 error += " Debe ser un numero.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 codigoPostalField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getLocalidad().equals("No disponible") || pasajeroDTO.getLocalidad().equals("Seleccionar")){
+            if(!validacionesCampos.getLocalidadValido()){
                 localidadCombo.setBorder(BorderFactory.createLineBorder(Color.RED));
                 mensajesError.add(errorSeleccion.replaceFirst("\\?", "Localidad"));
-                bandInterfaz = false;
             }
             else{
                 localidadCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getProvincia().equals("Seleccionar")){
+            if(!validacionesCampos.getProvinciaValido()){
                 provinciaCombo.setBorder(BorderFactory.createLineBorder(Color.RED));
                 mensajesError.add(errorSeleccion.replaceFirst("\\?", "Provincia"));
-                bandInterfaz = false;
             }
             else{
                 provinciaCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getTelefono().length() > 15 || pasajeroDTO.getTelefono().length() == 0 || !verificarTelefono(pasajeroDTO.getTelefono())){
+            if(!validacionesCampos.getTelefonoValido()){
                 telefonoField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = "Error en el campo Telefono. Un ejemplo de formato valido es: +5493424000000.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 telefonoField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getEmail().length()>70 || !verificarEmail(pasajeroDTO.getEmail())){
+            if(!validacionesCampos.getEmailValido()){
                 emailField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = "Error en el campo Email. El formato debe ser valido y contener como maximo 70 caracteres.";
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 emailField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getOcupacion().length()>50 || pasajeroDTO.getOcupacion().length()==0){
+            if(!validacionesCampos.getOcupacionValido()){
                 ocupacionField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = errorLargo.replaceFirst("\\?","Ocupacion");
                 error = error.replaceFirst("\\?","1");
                 error = error.replaceFirst("\\?","50");
                 mensajesError.add(error);
-                bandInterfaz = false;
             }
             else{
                 ocupacionField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
 
-            if(pasajeroDTO.getNacionalidad().equals("Seleccionar")){
+            if(!validacionesCampos.getNacionalidadValido()){
                 nacionalidadCombo.setBorder(BorderFactory.createLineBorder(Color.RED));
                 mensajesError.add(errorSeleccion.replaceFirst("\\?", "Nacionalidad"));
-                bandInterfaz = false;
             }
             else{
                 nacionalidadCombo.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -662,8 +646,7 @@ public class AltaPasajero extends javax.swing.JDialog {
             }
             JOptionPane.showMessageDialog(this, mensaje, "Error al completar los datos",JOptionPane.ERROR_MESSAGE);
         }
-        
-        if(bandInterfaz){
+        else{
             //No hay errores por lo que procedemos a verificar si hay un pasajero con mismo dni
             boolean existePasajero = getInstancePasajero().verificarExistenciaPasajero(pasajeroDTO);
             
@@ -678,7 +661,8 @@ public class AltaPasajero extends javax.swing.JDialog {
                 }
             }
             else{
-                //No hay pasajero con mismo dni por lo que el gestor ya guardo el pasajero
+                //No hay pasajero con mismo dni
+                guardarPasajero(pasajeroDTO);
                 //Se muestran los mensajes de exito
                 
                 Object [] opciones2 = {"SI","NO"};
@@ -781,7 +765,7 @@ public class AltaPasajero extends javax.swing.JDialog {
         String seleccion = (String) provinciaCombo.getSelectedItem();
         List <String> localidades = null;
         //Le pido al gestorGeografico las localidades de la provincia seleccionada
-        if(seleccion != "Seleccionar"){
+        if(!"Seleccionar".equals(seleccion)){
             localidades = getInstanceGeo().obtenerLocalidades(seleccion);
             Collections.sort(localidades);
             localidadCombo.removeAllItems();

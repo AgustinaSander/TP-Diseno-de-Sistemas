@@ -3,6 +3,8 @@ package Gestores;
 
 import DAO.*;
 import Dominio.*;
+import Enum.PosicionIVA;
+import Enum.TipoDocumento;
 import static Gestores.GestorGeografico.*;
 import static Validaciones.Validaciones.esNumero;
 import static Validaciones.Validaciones.verificarCUIT;
@@ -13,8 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GestorPasajero {
     private static GestorPasajero instanciaGPasajero = null;
@@ -30,24 +30,30 @@ public class GestorPasajero {
     }
     
     //Validaciones de interfaz Alta de Pasajero
-    public boolean validarDatosPasajero(PasajeroDTO datosPasajero){
+    public CamposAltaPasajero validarDatosPasajero(PasajeroDTO datosPasajero){
+        CamposAltaPasajero campos = new CamposAltaPasajero();
+        
         //Se validan todos los campos con expresiones regulares
-        Boolean bandGestor = true;
 
         if(datosPasajero.getNombre().length() > 50 || datosPasajero.getNombre().length() == 0){
-            bandGestor = false;
+            campos.setNombreValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getApellido().length() > 50 || datosPasajero.getApellido().length() == 0){
-            bandGestor = false;
+            campos.setApellidoValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
+
         }
 
         if(datosPasajero.getNumDoc().length() > 10 || datosPasajero.getNumDoc().length() == 0){
-            bandGestor = false;
+            campos.setNumDocValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getCUIT().length() > 15 || !verificarCUIT(datosPasajero.getCUIT())){
-            bandGestor = false;
+            campos.setCUITValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -59,50 +65,61 @@ public class GestorPasajero {
         }
 
         if(datosPasajero.getFechaNac()== null ||datosPasajero.getFechaNac().after(new java.util.Date()) || datosPasajero.getFechaNac().before(fechaMin)){
-            bandGestor = false;
+            campos.setFechaNacValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getCalle().length() > 50 || datosPasajero.getCalle().length() == 0){
-            bandGestor = false;
+             campos.setCalleValido(Boolean.FALSE);
+             campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getNumero().length() > 10 || datosPasajero.getNumero().length() == 0 || !esNumero(datosPasajero.getNumero())){
-            bandGestor = false;
+             campos.setNumeroValido(Boolean.FALSE);
+             campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getDepartamento().length() > 15){
-            bandGestor = false;
+            campos.setDepartamentoValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getCodigoPostal().length() > 5 || datosPasajero.getCodigoPostal().length() == 0 || !esNumero(datosPasajero.getCodigoPostal())){
-            bandGestor = false;
+            campos.setCodigoPostalValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getLocalidad().equals("No disponible") || datosPasajero.getLocalidad().equals("Seleccionar")){
-            bandGestor = false;
+            campos.setLocalidadValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getProvincia().equals("Seleccionar")){
-            bandGestor = false;
+            campos.setProvinciaValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getTelefono().length() > 15 || datosPasajero.getTelefono().length() == 0 || !verificarTelefono(datosPasajero.getTelefono())){
-            bandGestor = false;
+            campos.setFechaNacValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getEmail().length()>70 || !verificarEmail(datosPasajero.getEmail())){
-            bandGestor = false;
+            campos.setEmailValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getOcupacion().length()>50 || datosPasajero.getOcupacion().length()==0){
-            bandGestor = false;
+            campos.setOcupacionValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
 
         if(datosPasajero.getNacionalidad().equals("Seleccionar")){
-            bandGestor = false;
+            campos.setNacionalidadValido(Boolean.FALSE);
+            campos.setValidos(Boolean.FALSE);
         }
             
-        return bandGestor;
+        return campos;
     }
     
     //Verificar si existe un pasajero con mismo tipoDoc y numDoc
@@ -116,19 +133,12 @@ public class GestorPasajero {
             ex.printStackTrace(System.out);
         }
         
-        if(!existe){
-            try {
-                crearPasajero(pasajeroDTO);
-            } catch (ParseException ex) {
-                ex.printStackTrace(System.out);
-            }
-        }
-        
         return existe;
     }
     
     public Pasajero crearObjetoPasajero(PasajeroDTO pasajeroDTO){
         
+        //DEVOLVER TODO EL OBJETO
         //Creo el objeto de pais
         int idPais = getInstanceGeo().obtenerIdPais(pasajeroDTO.getPais());
         Pais pais = new Pais(idPais, pasajeroDTO.getPais(),pasajeroDTO.getPais());
@@ -143,14 +153,10 @@ public class GestorPasajero {
         Localidad localidad = new Localidad(idLocalidad, provincia, pasajeroDTO.getLocalidad());
 
         //Creo el objeto direccion
-        Direccion direccion = new Direccion(0, localidad, pasajeroDTO.getCalle(), Integer.parseInt(pasajeroDTO.getNumero()), pasajeroDTO.getDepartamento(), Integer.parseInt(pasajeroDTO.getCodigoPostal()));
-        
-        
-        //El gestor geografico crea el objeto direccion
-        //Direccion direccion = getInstanceGeo().crearObjetoDireccion(pasajeroDTO);
+        Direccion direccion = new Direccion(pasajeroDTO.getIdDireccion(), localidad, pasajeroDTO.getCalle(), Integer.parseInt(pasajeroDTO.getNumero()), pasajeroDTO.getDepartamento(), Integer.parseInt(pasajeroDTO.getCodigoPostal()));
         
         //Creo el objeto pasajero
-        Pasajero pasajero = new Pasajero(pasajeroDTO.getApellido(),pasajeroDTO.getNombre(),pasajeroDTO.getTipoDoc(),pasajeroDTO.getNumDoc(),pasajeroDTO.getFechaNac(), pasajeroDTO.getEmail(),pasajeroDTO.getOcupacion(),nacionalidad,0,pasajeroDTO.getCUIT(),pasajeroDTO.getPosIva(),pasajeroDTO.getTelefono(),direccion);
+        Pasajero pasajero = new Pasajero(pasajeroDTO.getApellido(),pasajeroDTO.getNombre(),pasajeroDTO.getTipoDoc(),pasajeroDTO.getNumDoc(),pasajeroDTO.getFechaNac(), pasajeroDTO.getEmail(),pasajeroDTO.getOcupacion(),nacionalidad,pasajeroDTO.getIdPersona(),pasajeroDTO.getCUIT(),pasajeroDTO.getPosIva(),pasajeroDTO.getTelefono(),direccion);
         
         return pasajero;
     }
@@ -159,8 +165,22 @@ public class GestorPasajero {
     public boolean crearPasajero(PasajeroDTO pasajeroDTO) throws ParseException{
         try {
             //Creo un objeto Pasajero con los datos de pasajeroDTO
-            Pasajero pasajero = crearObjetoPasajero(pasajeroDTO);
+            //String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, String email, String ocupacion, String CUIT, PosicionIVA posIva, String telefono
+            Pasajero pasajero = new Pasajero(pasajeroDTO.getApellido(), pasajeroDTO.getNombre(), pasajeroDTO.getTipoDoc(),pasajeroDTO.getNumDoc(), pasajeroDTO.getFechaNac(), pasajeroDTO.getEmail(), pasajeroDTO.getOcupacion(), pasajeroDTO.getCUIT(), pasajeroDTO.getPosIva(), pasajeroDTO.getTelefono());
             
+            //Obtengo el id del pais que va a ser la nacionalidad y creo un objeto Pais
+            int idNacionalidad = getInstanceGeo().obtenerIdPais(pasajeroDTO.getNacionalidad());
+            Pais nacionalidad = new Pais(idNacionalidad);
+            pasajero.setNacionalidad(nacionalidad);
+            
+            //Obtengo el id de la localidad y creo un objeto Localidad
+            int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad());
+            Localidad localidad = new Localidad(idLocalidad);
+            
+            //Creo objeto direccion 
+            Direccion direccion = new Direccion(localidad, pasajeroDTO.getCalle(), Integer.parseInt(pasajeroDTO.getNumero()), pasajeroDTO.getDepartamento(), Integer.parseInt(pasajeroDTO.getCodigoPostal()));
+            
+            pasajero.setDireccion(direccion);
             //PasajeroDAO crea el pasajero 
             pasajeroDAO.crearPasajero(pasajero);
 
@@ -173,9 +193,8 @@ public class GestorPasajero {
     
     
     //Buscar pasajeros cuyos datos coincidan con los criterios de busqueda
-    public List<Pasajero> buscarPasajeros(BusquedaDTO busquedaDTO){
-        ArrayList <Pasajero> resPasajeros = null;
-    
+    public List<GestionarPasajeroDTO> buscarPasajeros(GestionarPasajeroDTO busquedaDTO){
+        List <GestionarPasajeroDTO> listaPasajerosEncontrados = null;
         try {
 
             pasajeroDAO = new PasajeroDAOImpl();
@@ -192,26 +211,36 @@ public class GestorPasajero {
             }
             
             //PasajeroDAO obtiene los pasajeros que coincidan con los criterios de busqueda
-            resPasajeros = (ArrayList<Pasajero>) pasajeroDAO.obtenerPasajeros(busquedaDTO);
+            listaPasajerosEncontrados = pasajeroDAO.obtenerPasajeros(busquedaDTO);
             
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
        
-        return resPasajeros;
+        return listaPasajerosEncontrados;
     }
    
     //Modificar pasajero
-    public Boolean modificarPasajero(Pasajero pasajero) throws ParseException{ 
+    public Boolean modificarPasajero(PasajeroDTO pasajeroDTO) throws ParseException{ 
         try {
             pasajeroDAO = new PasajeroDAOImpl();
-            pasajeroDAO.modificarPasajero(pasajero);
+            pasajeroDAO.modificarPasajero(crearObjetoPasajero(pasajeroDTO));
             
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
             return false;
         }
         return true;
+    }
+    
+    public PasajeroDTO buscarPasajero(int idPasajero){
+        pasajeroDAO = new PasajeroDAOImpl();
+        Pasajero pasajero = pasajeroDAO.obtenerPasajero(idPasajero);
+        
+        //Creo el objeto pasajeroDTO a partir de pasajero
+        PasajeroDTO pasajeroDTO = new PasajeroDTO(pasajero.getApellido(), pasajero.getNombre(), pasajero.getTipoDoc(), pasajero.getNumDoc(), pasajero.getFechaNac(), pasajero.getEmail(), pasajero.getOcupacion(),pasajero.getNacionalidad().getNombrePais(),pasajero.getCUIT(),pasajero.getPosIva(),pasajero.getTelefono(), pasajero.getDireccion().getLocalidad().getProvincia().getPais().getNombrePais(),pasajero.getDireccion().getLocalidad().getProvincia().getNombreProvincia(), pasajero.getDireccion().getLocalidad().getNombreLocalidad(), pasajero.getDireccion().getCalle(),String.valueOf(pasajero.getDireccion().getNumero()),pasajero.getDireccion().getDepartamento(), String.valueOf(pasajero.getDireccion().getCodigoPostal()));
+        
+        return pasajeroDTO;
     }
     
 }

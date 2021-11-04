@@ -19,10 +19,14 @@ public class Direccion {
         this.localidad = localidad;
     }
 
-    public Direccion (int idDireccion, Direccion direccion){
-        this.idDireccion = idDireccion;
-        this.calle = direccion.getCalle();
+    public Direccion(Localidad localidad, String calle, int numero, String departamento, int codigoPostal) {
+        this.localidad = localidad;
+        this.calle = calle;
+        this.numero = numero;
+        this.departamento = departamento;
+        this.codigoPostal = codigoPostal;
     }
+
     
     public Direccion() {
     }
