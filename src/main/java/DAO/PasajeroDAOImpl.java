@@ -1,6 +1,7 @@
 
 package DAO;
 
+import Dominio.DTO.GestionarPasajeroDTO;
 import static Conexion.Conexion.*;
 import Dominio.*;
 import Enum.PosicionIVA;

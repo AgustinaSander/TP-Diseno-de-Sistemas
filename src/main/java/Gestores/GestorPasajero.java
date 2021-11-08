@@ -1,10 +1,11 @@
 
 package Gestores;
 
+import Validaciones.CamposAltaPasajero;
+import Dominio.DTO.PasajeroDTO;
+import Dominio.DTO.GestionarPasajeroDTO;
 import DAO.*;
 import Dominio.*;
-import Enum.PosicionIVA;
-import Enum.TipoDocumento;
 import static Gestores.GestorGeografico.*;
 import static Validaciones.Validaciones.esNumero;
 import static Validaciones.Validaciones.verificarCUIT;
@@ -13,7 +14,6 @@ import static Validaciones.Validaciones.verificarTelefono;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GestorPasajero {
@@ -64,7 +64,7 @@ public class GestorPasajero {
             ex.printStackTrace(System.out);
         }
 
-        if(datosPasajero.getFechaNac()== null ||datosPasajero.getFechaNac().after(new java.util.Date()) || datosPasajero.getFechaNac().before(fechaMin)){
+        if(datosPasajero.getFechaNac()== null || datosPasajero.getFechaNac().after(new java.util.Date()) || datosPasajero.getFechaNac().before(fechaMin)){
             campos.setFechaNacValido(Boolean.FALSE);
             campos.setValidos(Boolean.FALSE);
         }
@@ -100,7 +100,7 @@ public class GestorPasajero {
         }
 
         if(datosPasajero.getTelefono().length() > 15 || datosPasajero.getTelefono().length() == 0 || !verificarTelefono(datosPasajero.getTelefono())){
-            campos.setFechaNacValido(Boolean.FALSE);
+            campos.setTelefonoValido(Boolean.FALSE);
             campos.setValidos(Boolean.FALSE);
         }
 
@@ -146,10 +146,10 @@ public class GestorPasajero {
         int idNacionalidad = getInstanceGeo().obtenerIdPais(pasajeroDTO.getNacionalidad());
         Pais nacionalidad = new Pais(idNacionalidad,pasajeroDTO.getNacionalidad(),pasajeroDTO.getNacionalidad());
         //Creo el objeto provincia
-        int idProvincia = getInstanceGeo().obtenerIdProvincia(pasajeroDTO.getProvincia());
+        int idProvincia = getInstanceGeo().obtenerIdProvincia(pasajeroDTO.getProvincia(),idPais);
         Provincia provincia = new Provincia(idProvincia, pais, pasajeroDTO.getProvincia());
         //Creo el objeto localidad
-        int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad());
+        int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad(), pasajeroDTO.getProvincia(), pasajeroDTO.getPais());
         Localidad localidad = new Localidad(idLocalidad, provincia, pasajeroDTO.getLocalidad());
 
         //Creo el objeto direccion
@@ -165,7 +165,6 @@ public class GestorPasajero {
     public boolean crearPasajero(PasajeroDTO pasajeroDTO) throws ParseException{
         try {
             //Creo un objeto Pasajero con los datos de pasajeroDTO
-            //String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, String email, String ocupacion, String CUIT, PosicionIVA posIva, String telefono
             Pasajero pasajero = new Pasajero(pasajeroDTO.getApellido(), pasajeroDTO.getNombre(), pasajeroDTO.getTipoDoc(),pasajeroDTO.getNumDoc(), pasajeroDTO.getFechaNac(), pasajeroDTO.getEmail(), pasajeroDTO.getOcupacion(), pasajeroDTO.getCUIT(), pasajeroDTO.getPosIva(), pasajeroDTO.getTelefono());
             
             //Obtengo el id del pais que va a ser la nacionalidad y creo un objeto Pais
@@ -174,7 +173,7 @@ public class GestorPasajero {
             pasajero.setNacionalidad(nacionalidad);
             
             //Obtengo el id de la localidad y creo un objeto Localidad
-            int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad());
+            int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad(), pasajeroDTO.getProvincia(), pasajeroDTO.getPais());
             Localidad localidad = new Localidad(idLocalidad);
             
             //Creo objeto direccion 

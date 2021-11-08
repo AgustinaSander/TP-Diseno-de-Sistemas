@@ -1,5 +1,5 @@
 
-package Dominio;
+package Dominio.DTO;
 
 import Enum.TipoDocumento;
 

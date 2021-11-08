@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ILocalidadDAO {
     public List<String> obtenerLocalidad(int idLocalidad) throws SQLException;
-    public int obtenerIdLocalidad(String localidad) throws SQLException;
+    public int obtenerIdLocalidad(String localidad, int idProvincia) throws SQLException;
 }

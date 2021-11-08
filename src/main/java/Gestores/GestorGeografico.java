@@ -49,13 +49,13 @@ public class GestorGeografico {
         return listaProvincias;
     }
     
-    //Obtener listado de localidades que componen una provincia
-    public List<String> obtenerLocalidades(String provincia){
+    //Obtener listado de localidades que componen una provincia que pertenece a un pais
+    public List<String> obtenerLocalidades(String provincia, String pais){
         //ProvinciaDAO obtiene las localidades de la base de datos
         List <String> listaLocalidades = null;
         try {
             provinciaDAO = new ProvinciaDAOImpl();
-            listaLocalidades = provinciaDAO.obtenerLocalidades(provincia);
+            listaLocalidades = provinciaDAO.obtenerLocalidades(provincia, pais);
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
@@ -78,13 +78,13 @@ public class GestorGeografico {
     }
     
     //Obtener IdProvincia a partir del nombre
-    public int obtenerIdProvincia(String provincia){
+    public int obtenerIdProvincia(String provincia, int idPais){
         //ProvinciaDAO se encarga
         int idProvincia = 0;
         
         try {
             provinciaDAO = new ProvinciaDAOImpl();
-            idProvincia = provinciaDAO.obtenerIdProvincia(provincia);
+            idProvincia = provinciaDAO.obtenerIdProvincia(provincia, idPais);
             
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -93,13 +93,18 @@ public class GestorGeografico {
     }
     
     //Obtener IdLocalidad a partir del nombre
-    public int obtenerIdLocalidad(String localidad){
+    public int obtenerIdLocalidad(String localidad, String provincia, String pais){
         //LocalidadDAO se encarga
         int idLocalidad = 0;
         
         try {
+            //Obtengo el id del pais y de la provincia a la que pertenece la localidad
+            int idPais = obtenerIdPais(pais);
+            int idProvincia = obtenerIdProvincia(provincia, idPais);
+            
+            //Obtengo el id de la localidad con su nombre y el id de la provincia a la que pertenece
             localidadDAO = new LocalidadDAOImpl();
-            idLocalidad = localidadDAO.obtenerIdLocalidad(localidad);
+            idLocalidad = localidadDAO.obtenerIdLocalidad(localidad, idProvincia);
             
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);

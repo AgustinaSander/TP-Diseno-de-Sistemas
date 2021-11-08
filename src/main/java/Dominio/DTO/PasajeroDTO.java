@@ -1,5 +1,5 @@
 
-package Dominio;
+package Dominio.DTO;
 
 import Enum.PosicionIVA;
 import Enum.TipoDocumento;

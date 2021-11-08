@@ -1,5 +1,5 @@
 
-package Dominio;
+package Validaciones;
 
 public class CamposAltaPasajero {
     private Boolean validos;

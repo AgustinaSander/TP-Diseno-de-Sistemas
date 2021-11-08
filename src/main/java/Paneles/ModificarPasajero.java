@@ -5,9 +5,9 @@
  */
 package Paneles;
 
-import Dominio.CamposAltaPasajero;
-import Dominio.GestionarPasajeroDTO;
-import Dominio.PasajeroDTO;
+import Validaciones.CamposAltaPasajero;
+import Dominio.DTO.GestionarPasajeroDTO;
+import Dominio.DTO.PasajeroDTO;
 import Enum.PosicionIVA;
 import Enum.TipoDocumento;
 import static Gestores.GestorGeografico.*;
@@ -529,7 +529,7 @@ public class ModificarPasajero extends javax.swing.JDialog {
         List <String> localidades = null;
         //Le pido al gestorGeografico las localidades de la provincia seleccionada
         if(!"Seleccionar".equals(seleccion)){
-            localidades = getInstanceGeo().obtenerLocalidades(seleccion);
+            localidades = getInstanceGeo().obtenerLocalidades(seleccion, (String) paisCombo.getSelectedItem());
             Collections.sort(localidades);
             localidadCombo.removeAllItems();
             localidadCombo.addItem("Seleccionar");
@@ -643,14 +643,6 @@ public class ModificarPasajero extends javax.swing.JDialog {
             }
             else{
                 CUITField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            }
-
-            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date fechaMin = null;
-            try {
-                fechaMin = sdFormat.parse("1870-01-01");
-            } catch (ParseException ex) {
-                ex.printStackTrace(System.out);
             }
 
             if(!validacionesCampos.getFechaNacValido()){

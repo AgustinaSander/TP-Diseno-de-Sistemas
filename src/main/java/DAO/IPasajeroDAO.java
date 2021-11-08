@@ -1,7 +1,7 @@
 
 package DAO;
 
-import Dominio.GestionarPasajeroDTO;
+import Dominio.DTO.GestionarPasajeroDTO;
 import Dominio.Pasajero;
 import java.sql.SQLException;
 import java.util.List;

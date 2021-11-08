@@ -1,7 +1,7 @@
 
 package Paneles;
 
-import Dominio.GestionarPasajeroDTO;
+import Dominio.DTO.GestionarPasajeroDTO;
 import Dominio.Pasajero;
 import Enum.TipoDocumento;
 import static Gestores.GestorPasajero.*;

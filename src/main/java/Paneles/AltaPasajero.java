@@ -1,8 +1,8 @@
 
 package Paneles;
 
-import Dominio.CamposAltaPasajero;
-import Dominio.PasajeroDTO;
+import Validaciones.CamposAltaPasajero;
+import Dominio.DTO.PasajeroDTO;
 import Enum.PosicionIVA;
 import Enum.TipoDocumento;
 import static Gestores.GestorGeografico.*;
@@ -524,15 +524,7 @@ public class AltaPasajero extends javax.swing.JDialog {
             else{
                 CUITField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             }
-
-            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date fechaMin = null;
-            try {
-                fechaMin = sdFormat.parse("1870-01-01");
-            } catch (ParseException ex) {
-                ex.printStackTrace(System.out);
-            }
-
+            
             if(!validacionesCampos.getFechaNacValido()){
                 fechaNacField.setBorder(BorderFactory.createLineBorder(Color.RED));
                 String error = "Error en campo Fecha de Nacimiento. Es un campo obligatorio y su valor debe estar entre 01/01/1870 y el dia de hoy.";
@@ -663,18 +655,6 @@ public class AltaPasajero extends javax.swing.JDialog {
             else{
                 //No hay pasajero con mismo dni
                 guardarPasajero(pasajeroDTO);
-                //Se muestran los mensajes de exito
-                
-                Object [] opciones2 = {"SI","NO"};
-                int confirmacion = JOptionPane.showOptionDialog(this, "El pasajero "+ pasajeroDTO.getNombre() +" "+ pasajeroDTO.getApellido() +" ha sido satisfactoriamente cargado al sistema.\n¿Desea cargar otro?","Carga Exitosa",JOptionPane.YES_NO_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones2,null);
-                if(confirmacion != JOptionPane.OK_OPTION){
-                    //No se quieren cargar mas pasajeros, se cierra la interfaz
-                    this.dispose();
-                }
-                else{
-                    //Se desea cargar otro pasajero por lo que se vacian los campos
-                    vaciarCampos();
-                }
             }
         }
 
@@ -766,7 +746,7 @@ public class AltaPasajero extends javax.swing.JDialog {
         List <String> localidades = null;
         //Le pido al gestorGeografico las localidades de la provincia seleccionada
         if(!"Seleccionar".equals(seleccion)){
-            localidades = getInstanceGeo().obtenerLocalidades(seleccion);
+            localidades = getInstanceGeo().obtenerLocalidades(seleccion, (String) paisCombo.getSelectedItem());
             Collections.sort(localidades);
             localidadCombo.removeAllItems();
             localidadCombo.addItem("Seleccionar");

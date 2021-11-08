@@ -55,14 +55,15 @@ public class LocalidadDAOImpl implements ILocalidadDAO{
     }
     
     @Override
-    public int obtenerIdLocalidad(String nombre) throws SQLException{
+    public int obtenerIdLocalidad(String nombre, int idProvincia) throws SQLException{
         int idLocalidad = 0;
         try {
             //Si necesito aplicar transacciones
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
-            stmt = conn.prepareStatement("SELECT id FROM localidad WHERE localidad = ?");
+            stmt = conn.prepareStatement("SELECT id FROM localidad WHERE localidad = ? AND id_provincia = ?");
             stmt.setString(1,nombre);
+            stmt.setInt(2,idProvincia);
             rs = stmt.executeQuery();
             
             while(rs.next()){
