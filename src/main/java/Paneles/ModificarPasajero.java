@@ -14,7 +14,6 @@ import static Gestores.GestorGeografico.*;
 import static Gestores.GestorPasajero.*;
 import java.awt.Color;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
