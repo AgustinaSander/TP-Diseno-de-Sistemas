@@ -6,7 +6,7 @@ import java.sql.*;
 
 public class Conexion {
     //URL a base de datos tpDisenoSistemas
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/tpdisenosistemas?useSSL=false&useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";    
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/tpdisenosistemas?useSSL=false&useTimezone=true&serverTimezone=America/Argentina/Buenos_Aires&allowPublicKeyRetrieval=true";    
     private static final String JDBC_USER = "root";
     private static final String JDBC_PASSWORD = "";
     

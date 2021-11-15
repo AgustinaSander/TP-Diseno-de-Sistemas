@@ -28,17 +28,19 @@ public class ReservaDAOImpl implements IReservaDAO{
             java.sql.Date desde = new java.sql.Date(fechaDesde.getTime());
             java.sql.Date hasta = new java.sql.Date(fechaHasta.getTime());
             
-            stmt = conn.prepareStatement("SELECT f.*, r.* FROM fechareserva AS f, habitacion AS h, reserva AS r WHERE f.idHabitacion = h.id AND h.idTipoHabitacion = ? AND f.idReserva = r.id AND (((f.fechaDesde <= ?) AND (f.fechaHasta >= ?)) OR ((f.fechaDesde BETWEEN ? AND ?) AND (f.fechaHasta BETWEEN ? AND ?)) OR ((f.fechaDesde >= ?) AND (f.fechaHasta >= ?)))");
+            stmt = conn.prepareStatement("SELECT f.*, r.* FROM fechareserva AS f, habitacion AS h, reserva AS r WHERE f.idHabitacion = h.id AND h.idTipoHabitacion = ? AND f.idReserva = r.id AND (((f.fechaDesde <= ?) AND (f.fechaHasta >= ?)) OR ((f.fechaDesde <= ?) AND (f.fechaHasta BETWEEN ? AND ?)) OR ((f.fechaDesde BETWEEN ? AND ?) AND (f.fechaHasta BETWEEN ? AND ?)) OR ((f.fechaDesde >= ?) AND (f.fechaHasta >= ?)));");
             stmt.setInt(1,idTipoHabitacion);
             stmt.setDate(2,desde);
             stmt.setDate(3,hasta);
             stmt.setDate(4,desde);
-            stmt.setDate(5,hasta);
-            stmt.setDate(6,desde);
-            stmt.setDate(7,hasta);
-            stmt.setDate(8,desde);
-            stmt.setDate(9,hasta);
-            
+            stmt.setDate(5,desde);
+            stmt.setDate(6,hasta);
+            stmt.setDate(7,desde);
+            stmt.setDate(8,hasta);
+            stmt.setDate(9,desde);
+            stmt.setDate(10,hasta);
+            stmt.setDate(11,desde);
+            stmt.setDate(12,hasta);
             rs = stmt.executeQuery();
             
             while(rs.next()){

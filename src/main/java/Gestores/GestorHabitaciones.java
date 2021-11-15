@@ -93,7 +93,7 @@ public class GestorHabitaciones {
         return habitaciones;
     }
     
-    public void mostrarEstadoHabitaciones(String tipoHabitacion, Date fechaDesde, Date fechaHasta){
+    public Map <Integer, List<EstadoHabitacionDTO>> mostrarEstadoHabitaciones(String tipoHabitacion, Date fechaDesde, Date fechaHasta){
         
         habitacionDAO = new HabitacionDAOImpl();
         Map <Integer,String> habitaciones = new HashMap<>();
@@ -129,40 +129,117 @@ public class GestorHabitaciones {
         
         //Obtengo la lista de fechas entre FechaDesde y FechaHasta
         List<String> listaFechas = obtenerFechasIntermedias(fechaDesde, fechaHasta);
-        List<EstadoHabitacionDTO> aux = new ArrayList<>();
-        for(String fecha : listaFechas){
-            aux.add(new EstadoHabitacionDTO(fecha));
-        }
         
-        //Agrego todas las claves que van a ser los idHabitaciones con sus respectivas listas de objetos EstadoHabitacionDTO inicializadas unicamente con la fecha
-        for(Map.Entry<Integer, String> entry : habitaciones.entrySet()){
-            listaEstados.put(entry.getKey(), aux);
-        }
-        
-        //Recorro la lista de estadias y voy agregando las mismas a la lista de estados
-        for(Map.Entry<Integer, List<EstadiaDTO>> entry: listaEstadias.entrySet()){
-            //Para cada objeto EstadiaDTO de la habitacion
-            for(EstadiaDTO e : entry.getValue()){
+        //Agrego todas las claves que van a ser los idHabitaciones
+        for(Map.Entry<Integer, String> hab : habitaciones.entrySet()){
+            listaEstados.put(hab.getKey(), new ArrayList<>());
+            List<String> auxFechas = new ArrayList<>(listaFechas);
+            
+            //Si hay estadias que sean de esa habitacion
+            if(listaEstadias.get(hab.getKey()) != null){
+                //Recorro la lista de estadias y voy agregando las mismas a la lista de estados
+                List<EstadiaDTO> listaEstadiasHab = listaEstadias.get(hab.getKey());
                 
+                //Para cada objeto EstadiaDTO de la habitacion
+                for(EstadiaDTO e : listaEstadiasHab){  
+                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+
+                    //Obtengo todas las fechas intermedias de la estadia
+                    List<String> fechasEstadia = obtenerFechasIntermedias(e.getFechaDesde(),e.getFechaHasta()); //VER QUE PASA SI FECHADESDE = FECHAHASTA
+
+                    for(String fecha : fechasEstadia){
+                        if(auxFechas.indexOf(fecha) != -1){
+                            estados.add(new EstadoHabitacionDTO(e.getIdEstadia(), fecha, "Ocupada"));
+                            auxFechas.remove(auxFechas.indexOf(fecha));
+                        }  
+                    }
+
+                    //Agrego los estados a la lista final de estados
+                    listaEstados.put(hab.getKey(),estados);
+                }
             }
+
+            
+            //Si hay reservas que sean de esa habitacion
+            if(listaReservas.get(hab.getKey()) != null){
+                //Recorro la lista de estadias y voy agregando las mismas a la lista de estados
+                List<ReservaDTO> listaReservasHab = listaReservas.get(hab.getKey());
+                //Para cada objeto ReservaDTO de la habitacion
+                for(ReservaDTO e : listaReservasHab){  
+                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+
+                    //Obtengo todas las fechas intermedias de la estadia
+                    List<String> fechasReserva = obtenerFechasIntermedias(e.getFechaDesde(),e.getFechaHasta()); //VER QUE PASA SI FECHADESDE = FECHAHASTA
+
+                    for(String fecha : fechasReserva){
+                        if(auxFechas.indexOf(fecha) != -1){
+                            estados.add(new EstadoHabitacionDTO(e.getIdReserva(), fecha, "Reservada"));
+                            auxFechas.remove(auxFechas.indexOf(fecha));
+                        }  
+                    }
+
+                    //Agrego los estados a la lista final de estados
+                    listaEstados.put(hab.getKey(),estados);
+                }
+            }
+            
+            //Si hay inhabilitaciones que sean de esa habitacion
+            if(listaInhabilitados.get(hab.getKey()) != null){
+                //Recorro la lista de inhabilitados y voy agregando las mismas a la lista de estados
+                List<InhabilitadoDTO> listaInhabilitadosHab = listaInhabilitados.get(hab.getKey());
+                //Para cada objeto InhabilitadoDTO de la habitacion
+                for(InhabilitadoDTO e : listaInhabilitadosHab){  
+                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+
+                    //Obtengo todas las fechas intermedias de la inhabilitacion
+                    List<String> fechasInhabilitado = obtenerFechasIntermedias(e.getFechaDesde(),e.getFechaHasta()); //VER QUE PASA SI FECHADESDE = FECHAHASTA
+
+                    for(String fecha : fechasInhabilitado){
+                        if(auxFechas.indexOf(fecha) != -1){
+                            estados.add(new EstadoHabitacionDTO(e.getIdInhabilitado(), fecha, "Inhabilitada"));
+                            auxFechas.remove(auxFechas.indexOf(fecha));
+                        }  
+                    }
+
+                    //Agrego los estados a la lista final de estados
+                    listaEstados.put(hab.getKey(),estados);
+                }
+            }
+            
+            //Si hay fechas que no tienen estadia, reserva o inhabilitacion se ponen como desocupadas
+            
+            while(!auxFechas.isEmpty()){
+                List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+                estados.add(new EstadoHabitacionDTO(0,auxFechas.get(0),"Desocupada"));
+                listaEstados.put(hab.getKey(), estados);
+                auxFechas.remove(0);
+            }       
         }
-        
-        
-        
+        //System.out.println("Lista estados:" + listaEstados);
+        return listaEstados;
     }
     
-    public List<String> obtenerFechasIntermedias(Date fechaDesde, Date fechaHasta){       
+    public List<String> obtenerFechasIntermedias(Date fechaDesde, Date fechaHasta){
         List<String> fechas = new ArrayList<>();
     
-        Calendar comienzo = Calendar.getInstance();
+        Calendar comienzo = Calendar.getInstance(); 
         comienzo.setTime(fechaDesde);
+        comienzo.set(Calendar.HOUR_OF_DAY, 0);  
+        comienzo.set(Calendar.MINUTE, 0);  
+        comienzo.set(Calendar.SECOND, 0);  
+        comienzo.set(Calendar.MILLISECOND, 0);
         Calendar fin = Calendar.getInstance();
         fin.setTime(fechaHasta);
+        fin.set(Calendar.HOUR_OF_DAY, 0);  
+        fin.set(Calendar.MINUTE, 0);  
+        fin.set(Calendar.SECOND, 0);  
+        fin.set(Calendar.MILLISECOND, 0);
         while(comienzo.before(fin)){
             fechas.add(new SimpleDateFormat("dd-MM-yyyy").format(comienzo.getTime()));
             comienzo.add(Calendar.DAY_OF_YEAR,1);
         }
-        
+        fechas.add(new SimpleDateFormat("dd-MM-yyyy").format(fin.getTime()));
+
         return fechas;
     }
 }

@@ -5,11 +5,16 @@
  */
 package Paneles;
 
+import Dominio.DTO.EstadoHabitacionDTO;
 import Dominio.DTO.HabitacionDTO;
 import static Gestores.GestorHabitaciones.getInstanceHabitaciones;
+import java.awt.Dimension;
 import java.util.*;
 import javax.swing.JPanel;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JScrollPane;
+
+import javax.swing.JTable;
+
 
 /**
  *
@@ -26,20 +31,57 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         //Obtenemos los tipos de habitaciones disponibles
         List <String> tipoDeHabitaciones = getInstanceHabitaciones().obtenerTiposDeHabitaciones();
         List <JPanel> paneles = new ArrayList<>();
+        /*
         for(String tipo: tipoDeHabitaciones){
-            paneles.add(new JPanel());
-            
             jTabbedPane1.addTab(tipo, paneles.get(paneles.size()-1));
         }
         
         //Seleccionamos por default la Individual Estandar
         jTabbedPane1.setSelectedIndex(0);
-         
+        */
+        
         //Obtenemos las habitaciones de ese tipo
-        getInstanceHabitaciones().mostrarEstadoHabitaciones(jTabbedPane1.getTitleAt(jTabbedPane1.getSelectedIndex()), fechaDesde, fechaHasta);
+        Map <Integer, List<EstadoHabitacionDTO>> listaEstados = getInstanceHabitaciones().mostrarEstadoHabitaciones("Individual Estandar", fechaDesde, fechaHasta);
+        
+        //System.out.println(listaEstados);
+        List<HabitacionDTO> habitaciones = getInstanceHabitaciones().obtenerHabitaciones("Individual Estandar");
+        List<String> listaFechas = getInstanceHabitaciones().obtenerFechasIntermedias(fechaDesde, fechaHasta);
+       
+        String [] nombreColumnas = new String[habitaciones.size()];
+        for(int i=0; i<habitaciones.size(); i++){
+            nombreColumnas[i] = habitaciones.get(i).getNombre();
+        }
+        
+        Object[][] datos = new Object [listaFechas.size()][habitaciones.size()];
+        
+        for(int row = 0; row < listaFechas.size(); row++){
+            List<String> estados = new ArrayList<>();
+            for(int col = 0; col < habitaciones.size(); col++){
+               datos[row][col] = obtenerEstado(listaFechas.get(row), habitaciones.get(col), listaEstados.get(habitaciones.get(col).getId()));
+            }
+        }
+        JTable table = new JTable(datos, nombreColumnas);
+        JScrollPane scroll = new JScrollPane(table);
+        getContentPane().add(scroll);
         
     }
 
+    public String obtenerEstado(String fecha, HabitacionDTO hab, List<EstadoHabitacionDTO> estados){
+        Boolean estadoEncontrado = false;
+        String estado = null;
+        
+        int cont = 0;
+        while(!estadoEncontrado){
+            if(estados.get(cont).getFecha().equals(fecha)){
+                estadoEncontrado = true;
+                estado = estados.get(cont).getEstado();
+            }
+            else{
+                cont++;
+            }
+        }
+        return estado;
+    }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -50,7 +92,6 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -67,20 +108,15 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(248, 248, 248)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel3))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(44, 44, 44)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 786, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addGap(248, 248, 248)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addContainerGap(259, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -91,9 +127,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
                     .addComponent(jLabel4)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1))
-                .addGap(37, 37, 37)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(499, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -120,6 +154,5 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 }
