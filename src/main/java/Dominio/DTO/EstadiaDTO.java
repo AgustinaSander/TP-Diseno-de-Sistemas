@@ -4,25 +4,25 @@ package Dominio.DTO;
 import java.util.Date;
 
 public class EstadiaDTO {
-    private int idEstadia;
+    private int idHabitacion;
     private Date fechaDesde;
     private Date fechaHasta;
 
     public EstadiaDTO() {
     }
 
-    public EstadiaDTO(int idEstadia, Date fechaDesde, Date fechaHasta) {
-        this.idEstadia = idEstadia;
+    public EstadiaDTO(int idHabitacion, Date fechaDesde, Date fechaHasta) {
+        this.idHabitacion = idHabitacion;
         this.fechaDesde = fechaDesde;
         this.fechaHasta = fechaHasta;
     }
 
-    public int getIdEstadia() {
-        return idEstadia;
+    public int getIdHabitacion() {
+        return idHabitacion;
     }
 
-    public void setIdEstadia(int idEstadia) {
-        this.idEstadia = idEstadia;
+    public void setIdHabitacion(int idHabitacion) {
+        this.idHabitacion = idHabitacion;
     }
 
     public Date getFechaDesde() {
@@ -43,7 +43,7 @@ public class EstadiaDTO {
 
     @Override
     public String toString() {
-        return "EstadiaDTO{" + "idEstadia=" + idEstadia + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + '}';
+        return "EstadiaDTO{" + "idHabitacion=" + idHabitacion + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + '}';
     }
     
     

@@ -71,7 +71,7 @@
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="3">
-                <StringItem index="0" value="Pasajeros"/>
+                <StringItem index="0" value="PASAJEROS"/>
                 <StringItem index="1" value="Gestionar pasajero"/>
                 <StringItem index="2" value="Alta pasajero"/>
               </StringArray>
@@ -88,7 +88,7 @@
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="5">
-                <StringItem index="0" value="Pagos"/>
+                <StringItem index="0" value="PAGOS"/>
                 <StringItem index="1" value="Facturar"/>
                 <StringItem index="2" value="Gestionar responsable"/>
                 <StringItem index="3" value="Alta responsable"/>
@@ -107,7 +107,7 @@
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="4">
-                <StringItem index="0" value="Habitaciones"/>
+                <StringItem index="0" value="HABITACIONES"/>
                 <StringItem index="1" value="Reservar"/>
                 <StringItem index="2" value="Ocupar"/>
                 <StringItem index="3" value="Cancelar"/>
@@ -125,7 +125,7 @@
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="3">
-                <StringItem index="0" value="Listados"/>
+                <StringItem index="0" value="LISTADOS"/>
                 <StringItem index="1" value="Listar cheques"/>
                 <StringItem index="2" value="Listar ingresos"/>
               </StringArray>

@@ -1,12 +1,14 @@
 
 package DAO;
 
-import Dominio.DTO.EstadiaDTO;
+import Dominio.Estadia;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface IEstadiaDAO {
     
-    public Map <Integer, List<EstadiaDTO>> obtenerListaEstadias(int idTipoHabitacion, Date fechaDesde, Date fechaHasta);
+    public List<Estadia> obtenerListaEstadias(int idTipoHabitacion, Date fechaDesde, Date fechaHasta) throws SQLException;
+    public int crearEstadia(Estadia estadia) throws SQLException;
 }

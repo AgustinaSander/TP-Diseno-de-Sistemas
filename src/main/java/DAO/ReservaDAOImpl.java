@@ -3,6 +3,8 @@ package DAO;
 
 import static Conexion.Conexion.getConnection;
 import Dominio.DTO.ReservaDTO;
+import Dominio.FechaReserva;
+import Dominio.Reserva;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,8 +22,8 @@ public class ReservaDAOImpl implements IReservaDAO{
     private ResultSet rs = null;
 
     @Override
-    public Map<Integer, List<ReservaDTO>> obtenerListaReservas(int idTipoHabitacion, Date fechaDesde, Date fechaHasta) {
-         Map <Integer, List<ReservaDTO>> reservas = new HashMap <>();
+    public Map<Integer, List<FechaReserva>> obtenerListaReservas(int idTipoHabitacion, Date fechaDesde, Date fechaHasta) {
+         Map <Integer, List<FechaReserva>> reservas = new HashMap <>();
         try {
             conn = getConnection();
             
@@ -46,13 +48,25 @@ public class ReservaDAOImpl implements IReservaDAO{
             while(rs.next()){
                 int idHabitacion = rs.getInt("idHabitacion");
                 if(reservas.containsKey(idHabitacion)){
-                    System.out.println(reservas.get(idHabitacion));
-                    reservas.get(idHabitacion).add(new ReservaDTO(rs.getInt("idReserva"), rs.getDate("fechaDesde"), rs.getDate("fechaHasta"), rs.getString("nombre"), rs.getString("apellido"), rs.getString("telefono")));
+                    //Lista de reservas de esa habitacion
+                    List <FechaReserva> listaFechasReservas = reservas.get(idHabitacion);
+                    //Creo el objeto reserva, el objeto habitacion lo pongo en null porque no lo necesito
+                    Reserva reserva = new Reserva(rs.getInt("idReserva"), rs.getString("nombre"), rs.getString("apellido"), rs.getString("telefono"));
+                    //Creo el objeto fechaReserva que contiene la reserva
+                    FechaReserva fechaReserva = new FechaReserva(rs.getDate("fechaDesde"), rs.getTime("horaDesde").toLocalTime(), rs.getDate("fechaHasta"), rs.getTime("horaHasta").toLocalTime(), null, reserva);
+
+                    reservas.get(idHabitacion).add(fechaReserva);
                 }
                 else{
-                    List <ReservaDTO> listaReservas = new ArrayList<>();
-                    listaReservas.add(new ReservaDTO(rs.getInt("idReserva"), rs.getDate("fechaDesde"), rs.getDate("fechaHasta"), rs.getString("nombre"), rs.getString("apellido"), rs.getString("telefono")));
-                    reservas.put(idHabitacion, listaReservas);
+                    //Lista para guardar las reservas de esa habitacion
+                    List <FechaReserva> listaFechasReservas = new ArrayList<>();
+                    //Creo el objeto reserva, el objeto habitacion lo pongo en null porque no lo necesito
+                    Reserva reserva = new Reserva(rs.getInt("idReserva"), rs.getString("nombre"), rs.getString("apellido"), rs.getString("telefono"));
+                    //Creo el objeto fechaReserva que contiene la reserva
+                    FechaReserva fechaReserva = new FechaReserva(rs.getDate("fechaDesde"), rs.getTime("horaDesde").toLocalTime(), rs.getDate("fechaHasta"), rs.getTime("horaHasta").toLocalTime(), null, reserva);
+                    listaFechasReservas.add(fechaReserva);
+
+                    reservas.put(idHabitacion, listaFechasReservas);
                 }
             }
             
@@ -63,4 +77,38 @@ public class ReservaDAOImpl implements IReservaDAO{
         return reservas;
     }
     
+    
+    public List<FechaReserva> buscarReservas(int idHab, List<Date> fechas){
+        List<FechaReserva> fechasReservas = new ArrayList<>();
+        for(Date f: fechas){
+            try {
+                conn = getConnection();
+                stmt = conn.prepareStatement("SELECT * FROM `fechareserva` AS f ,`reserva` AS r WHERE idHabitacion = ? AND f.idReserva=r.id AND ? BETWEEN fechaDesde AND fechaHasta ");
+                stmt.setInt(1, idHab);
+                stmt.setDate(2, new java.sql.Date(f.getTime()));
+                rs = stmt.executeQuery();
+                while(rs.next()){
+                    Reserva r = new Reserva(rs.getInt("idReserva"), rs.getString("nombre"), rs.getString("apellido"), rs.getString("telefono"));
+                    FechaReserva fechaRes = new FechaReserva(rs.getDate("fechaDesde"), rs.getTime("horaDesde").toLocalTime(), rs.getDate("fechaHasta"), rs.getTime("horaHasta").toLocalTime(), null, r);
+                    
+                    //Si ya se agrego la fechaReserva a la lista de fechasReservas
+                    Boolean agregada = false;
+                    for(FechaReserva fr : fechasReservas){
+                        if(fr.getReserva().getIdReserva() == r.getIdReserva()){
+                            agregada = true;
+                            break;
+                        }
+                    }
+                    if(!agregada){
+                        fechasReservas.add(fechaRes);
+                    }
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        System.out.println("Fechas:" + fechasReservas);
+        return fechasReservas;
+    }
 }

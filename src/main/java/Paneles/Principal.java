@@ -21,28 +21,28 @@ public class Principal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        pasajerosCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pasajeros", "Gestionar pasajero", "Alta pasajero" }));
+        pasajerosCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PASAJEROS", "Gestionar pasajero", "Alta pasajero" }));
         pasajerosCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pasajerosComboActionPerformed(evt);
             }
         });
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pagos", "Facturar", "Gestionar responsable", "Alta responsable", "Ingresar pago" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PAGOS", "Facturar", "Gestionar responsable", "Alta responsable", "Ingresar pago" }));
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
             }
         });
 
-        habitacionesCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Habitaciones", "Reservar", "Ocupar", "Cancelar" }));
+        habitacionesCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HABITACIONES", "Reservar", "Ocupar", "Cancelar" }));
         habitacionesCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 habitacionesComboActionPerformed(evt);
             }
         });
 
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Listados", "Listar cheques", "Listar ingresos" }));
+        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "LISTADOS", "Listar cheques", "Listar ingresos" }));
         jComboBox4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox4ActionPerformed(evt);
@@ -105,8 +105,8 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
     private void habitacionesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_habitacionesComboActionPerformed
-        if(habitacionesCombo.getSelectedItem() == "Reservar"){
-            new SeleccionFechasEstadoHabitacion(this,true,"Reservar Habitacion").setVisible(true);
+        if(habitacionesCombo.getSelectedItem() == "Ocupar"){
+            new SeleccionFechasEstadoHabitacion(this,true,"Ocupar Habitacion").setVisible(true);
         }
     }//GEN-LAST:event_habitacionesComboActionPerformed
 

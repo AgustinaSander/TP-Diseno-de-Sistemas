@@ -2,6 +2,7 @@
 package Dominio.DTO;
 
 import Enum.TipoDocumento;
+import java.util.Date;
 
 public class GestionarPasajeroDTO {
     private int id;
@@ -10,6 +11,8 @@ public class GestionarPasajeroDTO {
     private String apellido;
     private TipoDocumento tipoDoc;
     private String numDoc;
+    private Date fechaNac;
+    private Boolean responsableHabitacion;
 
     public GestionarPasajeroDTO() {
     }
@@ -21,13 +24,27 @@ public class GestionarPasajeroDTO {
         this.numDoc = numDoc;
     }
 
-    public GestionarPasajeroDTO(int id, int idDireccion, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc) {
+    public GestionarPasajeroDTO(int id, int idDireccion, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc, Date fechaNac) {
         this.id = id;
         this.idDireccion = idDireccion;
         this.nombre = nombre;
         this.apellido = apellido;
         this.tipoDoc = tipoDoc;
         this.numDoc = numDoc;
+        this.fechaNac = fechaNac;
+    }
+
+    
+    
+    public GestionarPasajeroDTO(int id, int idDireccion, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc, Date fechaNac, Boolean responsable) {
+        this.id = id;
+        this.idDireccion = idDireccion;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+        this.fechaNac = fechaNac;
+        this.responsableHabitacion = responsable;
     }
 
     public int getId() {
@@ -79,10 +96,27 @@ public class GestionarPasajeroDTO {
         this.numDoc = numDoc;
     }
 
+    public Date getFechaNac() {
+        return fechaNac;
+    }
+
+    public void setFechaNac(Date fechaNac) {
+        this.fechaNac = fechaNac;
+    }
+
+    public Boolean getResponsableHabitacion() {
+        return responsableHabitacion;
+    }
+
+    public void setResponsableHabitacion(Boolean responsableHabitacion) {
+        this.responsableHabitacion = responsableHabitacion;
+    }
+
     @Override
     public String toString() {
-        return "BusquedaDTO{" + "nombre=" + nombre + ", apellido=" + apellido + ", tipoDoc=" + tipoDoc + ", numDoc=" + numDoc + '}';
+        return "GestionarPasajeroDTO{" + "id=" + id + ", idDireccion=" + idDireccion + ", nombre=" + nombre + ", apellido=" + apellido + ", tipoDoc=" + tipoDoc + ", numDoc=" + numDoc + ", fechaNac=" + fechaNac + ", responsableHabitacion=" + responsableHabitacion + '}';
     }
+
     
     
 }

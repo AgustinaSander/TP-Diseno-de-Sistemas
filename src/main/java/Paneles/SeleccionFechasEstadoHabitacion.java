@@ -176,12 +176,6 @@ public class SeleccionFechasEstadoHabitacion extends javax.swing.JDialog {
                 mensajesError.add(error);
             }
 
-            if(!fechasValidas.getHastaMenorADateToday()){
-                fechaHastaField.setBorder(BorderFactory.createLineBorder(Color.RED));
-                String error = "Fecha limite incorrecta. Seleccione una fecha anterior.";
-                mensajesError.add(error);
-            }
-
             //Mostramos el mensaje de error
             String mensaje = "";
             for(String m : mensajesError){

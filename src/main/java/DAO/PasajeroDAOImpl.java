@@ -133,8 +133,9 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             ex.printStackTrace(System.out);
         } finally{
             try {
-                close(stmt);
                 close(rs);
+                close(stmt);
+                close(conn);
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);
             }
@@ -151,7 +152,7 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
         try {
             conn = getConnection();
            
-            stmt = conn.prepareStatement("SELECT pasajero.idPersona,idDireccion,apellido,nombre,tipoDoc,numDoc FROM pasajero, persona WHERE ((? is null) or (? = apellido)) AND ((? is null) or (? = nombre)) AND ((? is null) or (? = tipoDoc)) AND ((? is null) or (? = numDoc)) AND pasajero.idPersona = persona.idPersona;");
+            stmt = conn.prepareStatement("SELECT pasajero.idPersona,idDireccion,apellido,nombre,tipoDoc,numDoc,fechaNac FROM pasajero, persona WHERE ((? is null) or (? = apellido)) AND ((? is null) or (? = nombre)) AND ((? is null) or (? = tipoDoc)) AND ((? is null) or (? = numDoc)) AND pasajero.idPersona = persona.idPersona;");
             stmt.setString(1,busquedaDTO.getApellido());
             stmt.setString(2,busquedaDTO.getApellido());
             stmt.setString(3,busquedaDTO.getNombre());
@@ -165,14 +166,15 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             while(rs.next()){                
                 //Creo el objeto GestionarPasajeroDTO
                 //int id, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc
-                pas = new GestionarPasajeroDTO(rs.getInt("idPersona"), rs.getInt("idDireccion"), rs.getString("nombre"),rs.getString("apellido"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"));
+                pas = new GestionarPasajeroDTO(rs.getInt("idPersona"), rs.getInt("idDireccion"), rs.getString("nombre"),rs.getString("apellido"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"),rs.getDate("fechaNac"));
                 resPasajeros.add(pas);
                 
             }
         }finally{
             try {
-                close(stmt);
                 close(rs);
+                close(stmt);
+                close(conn);
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);
             }

@@ -3,10 +3,10 @@ package Gestores;
 
 import DAO.IInhabilitadoDAO;
 import DAO.InhabilitadoDAOImpl;
-import Dominio.DTO.InhabilitadoDTO;
+import Dominio.Inhabilitado;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 
 public class GestorInhabilitado {
     private static GestorInhabilitado instanciaGInhabilitado = null;
@@ -22,9 +22,9 @@ public class GestorInhabilitado {
         return instanciaGInhabilitado;
     }
     
-    public Map <Integer, List<InhabilitadoDTO>> obtenerListaInhabilitados(int idTipoHabitacion, Date fechaDesde, Date fechaHasta){
+    public List<Inhabilitado> obtenerListaInhabilitados(int idTipoHabitacion, Date fechaDesde, Date fechaHasta){
         inhabilitadoDAO = new InhabilitadoDAOImpl();
-        Map <Integer, List<InhabilitadoDTO>> listaInhabilitados = inhabilitadoDAO.obtenerListaInhabilitados(idTipoHabitacion, fechaDesde, fechaHasta);
+        List<Inhabilitado> listaInhabilitados = inhabilitadoDAO.obtenerListaInhabilitados(idTipoHabitacion, fechaDesde, fechaHasta);
          
         return listaInhabilitados;
     }

@@ -6,14 +6,12 @@ public class FechasEstadoHabitaciones {
     private Boolean fechaHastaValido;
     private Boolean fechaDesdeValido;
     private Boolean desdeMenorAHasta;
-    private Boolean hastaMenorADateToday;
 
     public FechasEstadoHabitaciones() {
         this.validos = true;
         this.fechaHastaValido = true;
         this.fechaDesdeValido = true;
         this.desdeMenorAHasta = true;
-        this.hastaMenorADateToday = true;
     }
 
     public Boolean getValidos() {
@@ -47,14 +45,5 @@ public class FechasEstadoHabitaciones {
     public void setDesdeMenorAHasta(Boolean desdeMenorAHasta) {
         this.desdeMenorAHasta = desdeMenorAHasta;
     }
-
-    public Boolean getHastaMenorADateToday() {
-        return hastaMenorADateToday;
-    }
-
-    public void setHastaMenorADateToday(Boolean hastaMenorADateToday) {
-        this.hastaMenorADateToday = hastaMenorADateToday;
-    }
-    
     
 }

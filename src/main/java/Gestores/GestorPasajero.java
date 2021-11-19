@@ -242,4 +242,8 @@ public class GestorPasajero {
         return pasajeroDTO;
     }
     
+    public Pasajero obtenerPasajero(int idPasajero){
+        pasajeroDAO = new PasajeroDAOImpl();
+        return pasajeroDAO.obtenerPasajero(idPasajero);
+    }
 }

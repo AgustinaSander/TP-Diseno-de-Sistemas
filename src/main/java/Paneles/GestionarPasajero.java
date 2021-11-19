@@ -239,12 +239,18 @@ public class GestionarPasajero extends javax.swing.JDialog {
         //El gestor de pasajeros realiza la busqueda 
         resPasajeros = getInstancePasajero().buscarPasajeros(busquedaDTO);
         DefaultTableModel tabla = (DefaultTableModel) resultadosTabla.getModel();
+        
         tabla.setRowCount(0);
         //Si no hay resultados
         if(resPasajeros.isEmpty()){
-            JOptionPane.showMessageDialog(this, "No existen pasajeros que coincidan con los criterios de busqueda.", "Pasajero no encontrado",JOptionPane.ERROR_MESSAGE);
-            this.dispose();
-            new AltaPasajero(null,true).setVisible(true);
+            Object[] opciones = {"SI","NO"};
+            int confirmacion = JOptionPane.showOptionDialog(this, "No existen pasajeros que coincidan con los criterios de busqueda. \n ¿Desea dar de alta un pasajero?","Pasajero no encontrado",JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE, null,opciones,null);
+            if(confirmacion == JOptionPane.OK_OPTION){
+                this.dispose();
+                new AltaPasajero(null,true).setVisible(true);
+            }
+           
+            
         }
         else{
             //Completo la tabla con los pasajeros encontrados
