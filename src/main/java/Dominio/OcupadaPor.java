@@ -3,15 +3,13 @@ package Dominio;
 
 public class OcupadaPor {
     private Pasajero pasajero;
-    private Estadia estadia;
     private Boolean esResponsable;
 
     public OcupadaPor() {
     }
 
-    public OcupadaPor(Pasajero pasajero, Estadia estadia, Boolean esResponsable) {
+    public OcupadaPor(Pasajero pasajero, Boolean esResponsable) {
         this.pasajero = pasajero;
-        this.estadia = estadia;
         this.esResponsable = esResponsable;
     }
 
@@ -21,14 +19,6 @@ public class OcupadaPor {
 
     public void setPasajero(Pasajero pasajero) {
         this.pasajero = pasajero;
-    }
-
-    public Estadia getEstadia() {
-        return estadia;
-    }
-
-    public void setEstadia(Estadia estadia) {
-        this.estadia = estadia;
     }
 
     public Boolean getEsResponsable() {
@@ -41,8 +31,10 @@ public class OcupadaPor {
 
     @Override
     public String toString() {
-        return "OcupadaPor{" + "pasajero=" + pasajero + ", estadia=" + estadia + ", esResponsable=" + esResponsable + '}';
+        return "OcupadaPor{" + "pasajero=" + pasajero + ", esResponsable=" + esResponsable + '}';
     }
+
+    
     
     
 }

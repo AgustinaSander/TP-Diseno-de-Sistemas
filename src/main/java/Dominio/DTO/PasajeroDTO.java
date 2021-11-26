@@ -27,6 +27,22 @@ public class PasajeroDTO {
     private int idPersona;
     private int idDireccion;
 
+    public PasajeroDTO(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, String CUIT, PosicionIVA posIva, String telefono, int idPersona, int idDireccion) {
+        this.apellido = apellido;
+        this.nombre = nombre;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+        this.fechaNac = fechaNac;
+        this.email = email;
+        this.CUIT = CUIT;
+        this.posIva = posIva;
+        this.telefono = telefono;
+        this.idPersona = idPersona;
+        this.idDireccion = idDireccion;
+    }
+
+    
+    
     public PasajeroDTO(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, String ocupacion, String nacionalidad, String CUIT, PosicionIVA posIva, String telefono, String pais, String provincia, String localidad, String calle, String numero, String departamento, String codigoPostal) {
         this.apellido = apellido;
         this.nombre = nombre;
@@ -48,6 +64,16 @@ public class PasajeroDTO {
         this.codigoPostal = codigoPostal;
     }
 
+    public PasajeroDTO(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, int idPersona) {
+        this.apellido = apellido;
+        this.nombre = nombre;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+        this.idPersona = idPersona;
+    }
+
+    
+    
     public int getIdPersona() {
         return idPersona;
     }

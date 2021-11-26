@@ -32,6 +32,13 @@ public abstract class Persona {
         this.direccion = direccion;
     }
 
+    public Persona(int idPersona, String CUIT, PosicionIVA posIva, String telefono) {
+        this.idPersona = idPersona;
+        this.CUIT = CUIT;
+        this.posIva = posIva;
+        this.telefono = telefono;
+    }
+
     public int getIdPersona() {
         return idPersona;
     }

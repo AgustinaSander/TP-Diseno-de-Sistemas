@@ -6,9 +6,7 @@ import static Conexion.Conexion.getConnection;
 import Dominio.Habitacion;
 import Dominio.TipoDeHabitacion;
 import java.sql.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 
 public class HabitacionDAOImpl implements IHabitacionDAO{
@@ -18,75 +16,9 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
     
+   
     @Override
-    public List<String> obtenerTiposDeHabitaciones() throws SQLException{
-        List<String> tiposHabitaciones = new ArrayList <>();
-        try {
-            conn = getConnection();
-            stmt = conn.prepareStatement("SELECT nombre FROM tipodehabitacion");
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                tiposHabitaciones.add(rs.getString("nombre"));
-            }
-        } finally{
-            try {
-                close(stmt);
-                close(rs);
-            } catch (SQLException ex) {
-                ex.printStackTrace(System.out);
-            }
-        }
-
-        return tiposHabitaciones;
-    }
-
-    @Override
-    public int obtenerIdTipoHabitacion(String tipoHabitacion) throws SQLException{
-        int id = 0;
-        try {
-            conn = getConnection();
-            stmt = conn.prepareStatement("SELECT id FROM tipodehabitacion WHERE nombre = ?");
-            stmt.setString(1,tipoHabitacion);
-            rs = stmt.executeQuery();
-            while(rs.next())
-                id = rs.getInt("id");
-        } finally{
-            try {
-                close(stmt);
-                close(rs);
-            } catch (SQLException ex) {
-                ex.printStackTrace(System.out);
-            }
-        }
-        return id;
-    }
-    
-    @Override
-    public Map <Integer ,String> obtenerHabitaciones(int idTipoHabitacion) throws SQLException{
-        Map <Integer, String> habitaciones = new HashMap<>();
-        try {
-            conn = getConnection();
-            stmt = conn.prepareStatement("SELECT id, nro FROM habitacion WHERE idTipoHabitacion = ? ");
-            stmt.setInt(1,idTipoHabitacion);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                habitaciones.put(rs.getInt("id"), rs.getString("nro"));
-            }
-            
-        } finally{
-            try {
-                close(stmt);
-                close(rs);
-            } catch (SQLException ex) {
-                ex.printStackTrace(System.out);
-            }
-        }
-        
-        return habitaciones;
-    }
-
-    @Override
-    public Habitacion obtenerHabitacion(int idHabitacion) {
+    public Habitacion obtenerHabitacion(int idHabitacion) throws SQLException{
         Habitacion hab = null;
         try {
             conn = getConnection();
@@ -98,9 +30,35 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
                 hab = new Habitacion(rs.getInt("idHabitacion"),rs.getString("nro"), rs.getFloat("precioHabitacion"), tipo);
             }
             
-        } catch (SQLException ex) {
-            ex.printStackTrace(System.out);
+        } finally {
+            try {
+                close(stmt);
+                close(rs);
+                close(conn);
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
         }
         return hab;
     }
+
+    @Override
+    public Boolean buscarNroHabitacion(String nroHabitacion) {
+        Boolean nroExistente = false;
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement("SELECT COUNT(*) FROM `habitacion` WHERE nro = ?");
+            stmt.setString(1, nroHabitacion);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                if(rs.getInt("COUNT(*)") > 0){
+                    nroExistente = true;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return nroExistente;
+    }
+
 }

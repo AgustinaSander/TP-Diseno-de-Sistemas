@@ -19,6 +19,10 @@ public class Direccion {
         this.localidad = localidad;
     }
 
+    public Direccion(int idDireccion) {
+        this.idDireccion = idDireccion;
+    }
+
     public Direccion(Localidad localidad, String calle, int numero, String departamento, int codigoPostal) {
         this.localidad = localidad;
         this.calle = calle;

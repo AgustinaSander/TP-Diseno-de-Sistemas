@@ -1,11 +1,14 @@
 
 package Dominio;
 
+import java.util.List;
+
 public class TipoDeHabitacion {
     private int idTipoHabitacion;
     private String nombre;
     private Float precio;
-
+    private List<Habitacion> listaHabitaciones;
+    
     public TipoDeHabitacion() {
     }
 
@@ -17,6 +20,13 @@ public class TipoDeHabitacion {
         this.idTipoHabitacion = idTipoHabitacion;
         this.nombre = nombre;
         this.precio = precio;
+    }
+
+    public TipoDeHabitacion(int idTipoHabitacion, String nombre, Float precio, List<Habitacion> listaHabitaciones) {
+        this.idTipoHabitacion = idTipoHabitacion;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.listaHabitaciones = listaHabitaciones;
     }
 
     public int getIdTipoHabitacion() {
@@ -43,10 +53,18 @@ public class TipoDeHabitacion {
         this.precio = precio;
     }
 
+    public List<Habitacion> getListaHabitaciones() {
+        return listaHabitaciones;
+    }
+
+    public void setListaHabitaciones(List<Habitacion> listaHabitaciones) {
+        this.listaHabitaciones = listaHabitaciones;
+    }
+
     @Override
     public String toString() {
-        return "TipoDeHabitacion{" + "idTipoHabitacion=" + idTipoHabitacion + ", nombre=" + nombre + ", precio=" + precio + '}';
+        return "TipoDeHabitacion{" + "idTipoHabitacion=" + idTipoHabitacion + ", nombre=" + nombre + ", precio=" + precio + ", listaHabitaciones=" + listaHabitaciones + '}';
     }
-    
-    
+
+ 
 }

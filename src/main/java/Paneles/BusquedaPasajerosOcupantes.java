@@ -6,6 +6,7 @@ import Dominio.DTO.GestionarPasajeroDTO;
 import Enum.TipoDocumento;
 import static Gestores.GestorEstadias.getInstanceEstadias;
 import static Gestores.GestorPasajero.*;
+import static Validaciones.Validaciones.calcularEdad;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -281,7 +282,7 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
         }
         else{
             //Si se selecciono al menos uno
-            //Tengo que ver si seleccionaron solo UN responsable de pago
+            //Tengo que ver si seleccionaron solo UN responsable de habitacion
             int filaResponsable = -1;
             int cont = 0;
             int i=0;
@@ -378,14 +379,6 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_aceptarBtnActionPerformed
 
-    public int calcularEdad(Date fechaNac){
-        int edad = 0;
-        LocalDate fecha = Instant.ofEpochMilli(fechaNac.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate ahora = LocalDate.now();
-        Period periodo = Period.between(fecha, ahora);
-        
-        return periodo.getYears();
-    }
     
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
         Object[] opciones = {"SI","NO"};

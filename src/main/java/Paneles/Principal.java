@@ -15,7 +15,7 @@ public class Principal extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         pasajerosCombo = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        pagosCombo = new javax.swing.JComboBox<>();
         habitacionesCombo = new javax.swing.JComboBox<>();
         jComboBox4 = new javax.swing.JComboBox<>();
 
@@ -28,10 +28,10 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PAGOS", "Facturar", "Gestionar responsable", "Alta responsable", "Ingresar pago" }));
-        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+        pagosCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PAGOS", "Facturar", "Gestionar responsable", "Alta responsable", "Ingresar pago" }));
+        pagosCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox2ActionPerformed(evt);
+                pagosComboActionPerformed(evt);
             }
         });
 
@@ -56,7 +56,7 @@ public class Principal extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pagosCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pasajerosCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(habitacionesCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -68,7 +68,7 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(44, 44, 44)
                 .addComponent(pasajerosCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pagosCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37)
                 .addComponent(habitacionesCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(38, 38, 38)
@@ -100,9 +100,11 @@ public class Principal extends javax.swing.JFrame {
             
     }//GEN-LAST:event_pasajerosComboActionPerformed
 
-    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox2ActionPerformed
+    private void pagosComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pagosComboActionPerformed
+        if(pagosCombo.getSelectedItem() == "Facturar"){
+            new ElegirResponsableDePago(this,true).setVisible(true);
+        }
+    }//GEN-LAST:event_pagosComboActionPerformed
 
     private void habitacionesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_habitacionesComboActionPerformed
         if(habitacionesCombo.getSelectedItem() == "Ocupar"){
@@ -121,9 +123,9 @@ public class Principal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> habitacionesCombo;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JComboBox<String> jComboBox4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JComboBox<String> pagosCombo;
     private javax.swing.JComboBox<String> pasajerosCombo;
     // End of variables declaration//GEN-END:variables
 }

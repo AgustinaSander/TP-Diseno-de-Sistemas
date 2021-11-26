@@ -18,6 +18,17 @@ public class Pasajero extends Persona{
     public Pasajero() {
     }
 
+    public Pasajero(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, int idPersona, String CUIT, PosicionIVA posIva, String telefono, Direccion direccion) {
+        super(idPersona, CUIT, posIva, telefono, direccion);
+        this.apellido = apellido;
+        this.nombre = nombre;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+        this.fechaNac = fechaNac;
+        this.email = email;
+    }
+
+    
     public Pasajero(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, Date fechaNac, String email, String ocupacion, Pais nacionalidad, int idPersona, String CUIT, PosicionIVA posIva, String telefono, Direccion direccion) {
         super(idPersona, CUIT, posIva, telefono, direccion);
         this.apellido = apellido;
@@ -51,6 +62,16 @@ public class Pasajero extends Persona{
         this.email = email;
         this.ocupacion = ocupacion;
     }
+
+    public Pasajero(String apellido, String nombre, TipoDocumento tipoDoc, String numDoc, int idPersona) {
+        super(idPersona);
+        this.apellido = apellido;
+        this.nombre = nombre;
+        this.tipoDoc = tipoDoc;
+        this.numDoc = numDoc;
+    }
+
+    
 
     public String getApellido() {
         return apellido;

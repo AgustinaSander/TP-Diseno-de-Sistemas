@@ -8,6 +8,7 @@ public class Reserva {
     private String nombre;
     private String apellido;
     private String telefono;
+    private List<FechaReserva> listaFechaReserva;
 
     public Reserva() {
     }
@@ -20,6 +21,14 @@ public class Reserva {
         
     }
 
+    public Reserva(int idReserva, String nombre, String apellido, String telefono, List<FechaReserva> listaFechaReserva) {
+        this.idReserva = idReserva;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.telefono = telefono;
+        this.listaFechaReserva = listaFechaReserva;
+    }
+    
     public int getIdReserva() {
         return idReserva;
     }
@@ -52,11 +61,17 @@ public class Reserva {
         this.telefono = telefono;
     }
 
-    
+    public List<FechaReserva> getListaFechaReserva() {
+        return listaFechaReserva;
+    }
+
+    public void setListaFechaReserva(List<FechaReserva> listaFechaReserva) {
+        this.listaFechaReserva = listaFechaReserva;
+    }
+
     @Override
     public String toString() {
-        return "Reserva{" + "idReserva=" + idReserva + ", nombre=" + nombre + ", apellido=" + apellido + ", telefono=" + telefono + "}";
+        return "Reserva{" + "idReserva=" + idReserva + ", nombre=" + nombre + ", apellido=" + apellido + ", telefono=" + telefono + ", listaFechaReserva=" + listaFechaReserva + '}';
     }
-    
-    
+
 }

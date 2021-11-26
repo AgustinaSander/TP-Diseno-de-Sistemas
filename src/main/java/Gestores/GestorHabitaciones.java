@@ -4,30 +4,36 @@ import DAO.EstadiaDAOImpl;
 import DAO.HabitacionDAOImpl;
 import DAO.IEstadiaDAO;
 import DAO.IHabitacionDAO;
+import DAO.IInhabilitadoDAO;
 import DAO.IReservaDAO;
+import DAO.ITipoHabitacionDAO;
+import DAO.InhabilitadoDAOImpl;
 import DAO.ReservaDAOImpl;
+import DAO.TipoHabitacionDAOImpl;
 
 import Dominio.DTO.EstadoHabitacionDTO;
 import Dominio.DTO.HabitacionDTO;
-import Dominio.DTO.ReservaDTO;
 
 import Dominio.Estadia;
+import Dominio.FechaReserva;
 import Dominio.Habitacion;
 import Dominio.Inhabilitado;
 import Dominio.Reserva;
-import static Gestores.GestorEstadias.getInstanceEstadias;
-import static Gestores.GestorInhabilitado.getInstanceInhabilitado;
-import static Gestores.GestorReservas.getInstanceReservas;
+import Dominio.TipoDeHabitacion;
 import Validaciones.FechasEstadoHabitaciones;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import static java.util.Objects.isNull;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 
 public class GestorHabitaciones {
     private static GestorHabitaciones instanciaGHabitaciones = null;
     private static IHabitacionDAO habitacionDAO = null;
+    private static ITipoHabitacionDAO tipoHabitacionDAO = null;
 
     private GestorHabitaciones(){};
     
@@ -61,11 +67,11 @@ public class GestorHabitaciones {
     
     public List <String> obtenerTiposDeHabitaciones(){
         
-        habitacionDAO = new HabitacionDAOImpl();
+        tipoHabitacionDAO = new TipoHabitacionDAOImpl();
         
         List<String> tiposHabitaciones = null;
         try {
-            tiposHabitaciones = habitacionDAO.obtenerTiposDeHabitaciones();
+            tiposHabitaciones = tipoHabitacionDAO.obtenerTiposDeHabitaciones();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
@@ -73,55 +79,37 @@ public class GestorHabitaciones {
         return tiposHabitaciones;
     }
     
-    public List<HabitacionDTO> obtenerHabitaciones(String tipoHabitacion){
-        
-        habitacionDAO = new HabitacionDAOImpl();
-        
-        Map <Integer ,String> aux = new HashMap<>();
-        try {
-            int id = habitacionDAO.obtenerIdTipoHabitacion(tipoHabitacion);
-            aux = habitacionDAO.obtenerHabitaciones(id);
-        } catch (SQLException ex) {
-            ex.printStackTrace(System.out);
-        }
-        List <HabitacionDTO> habitaciones = new ArrayList<>();
-        for(Map.Entry<Integer,String> entry : aux.entrySet()){
-            habitaciones.add(new HabitacionDTO(entry.getKey(),entry.getValue()));
-        }
-        return habitaciones;
-    }
     
     public Map <Integer, List<EstadoHabitacionDTO>> mostrarEstadoHabitaciones(String tipoHabitacion, Date fechaDesde, Date fechaHasta){
         
+        tipoHabitacionDAO = new TipoHabitacionDAOImpl();
         habitacionDAO = new HabitacionDAOImpl();
         
-        //Se guardan todas las habitaciones de ese tipo con el formato <idHab, nombreHab>
-        Map <Integer,String> habitaciones = new HashMap<>();
+        //Se guardan todas las habitaciones de ese tipo
+        List<Habitacion> habitaciones = new ArrayList<>();
         //Se guarda la lista de estadias de ese tipo de habitacion dentro del rango de fechas
         List<Estadia> listaEstadias = new ArrayList<>();
         //Se guarda la lista de reservas de ese tipo de habitacion dentro del rango de fechas
-        Map <Integer, List<ReservaDTO>> listaReservas = new HashMap<>();
+        List<Reserva> listaReservas = new ArrayList<>();
         //Se guarda la lista de inhabilitadas de ese tipo de habitacion dentro del rango de fechas
         List<Inhabilitado> listaInhabilitados = new ArrayList<>();
 
         try {
-            //Obtengo el id del tipoHabitacion seleccionado
-            int idTipoHabitacion = habitacionDAO.obtenerIdTipoHabitacion(tipoHabitacion);
+            //Obtengo las habitaciones de ese tipo 
+            habitaciones = tipoHabitacionDAO.obtenerHabitaciones(tipoHabitacion);
             
-            //Obtengo las habitaciones de ese tipo <idHabitacion, nombre>
-            habitaciones = habitacionDAO.obtenerHabitaciones(idTipoHabitacion);
-            
-            //Llamo a los respectivos gestores para obtener las listas
             //Obtengo la lista de estadias de todas las habitaciones de ese tipo
-            listaEstadias = getInstanceEstadias().obtenerListaEstadias(idTipoHabitacion, fechaDesde, fechaHasta);
+            IEstadiaDAO estadiaDAO = new EstadiaDAOImpl();
+            listaEstadias = estadiaDAO.obtenerListaEstadias(habitaciones, fechaDesde, fechaHasta);
             
             //Obtengo la lista de reservas de todas las habitaciones de ese tipo
-            listaReservas = getInstanceReservas().obtenerListaReservas(idTipoHabitacion, fechaDesde, fechaHasta);
+            IReservaDAO reservaDAO = new ReservaDAOImpl();
+            listaReservas = reservaDAO.obtenerListaReservas(habitaciones, fechaDesde, fechaHasta);
             
             //Obtengo la lista de inhabilitados de todas las habitaciones de ese tipo
-            listaInhabilitados = getInstanceInhabilitado().obtenerListaInhabilitados(idTipoHabitacion, fechaDesde, fechaHasta);
-            
-            
+            IInhabilitadoDAO inhabilitadoDAO = new InhabilitadoDAOImpl();
+            listaInhabilitados = inhabilitadoDAO.obtenerListaInhabilitados(habitaciones, fechaDesde, fechaHasta);
+
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
@@ -133,14 +121,14 @@ public class GestorHabitaciones {
         List<String> listaFechas = obtenerFechasIntermedias(fechaDesde, fechaHasta);
         
         //Agrego todas las claves que van a ser los idHabitaciones
-        for(Map.Entry<Integer, String> hab : habitaciones.entrySet()){
-            listaEstados.put(hab.getKey(), new ArrayList<>());
+        for(Habitacion hab : habitaciones){
+            listaEstados.put(hab.getIdHabitacion(), new ArrayList<>());
             
             //Creo una lista de fechas auxiliar para ir borrando las que ya fueron guardadas
             List<String> auxFechas = new ArrayList<>(listaFechas);
             
             //Filtro las estadias de esa habitacion
-            List<Estadia> estadiasDeHab = recuperarEstadiasDeUnaHabitacion(listaEstadias, hab.getKey());
+            List<Estadia> estadiasDeHab = recuperarEstadiasDeUnaHabitacion(listaEstadias, hab.getIdHabitacion());
             
             //Si hay estadias que sean de esa habitacion
             if(!estadiasDeHab.isEmpty()){
@@ -149,7 +137,7 @@ public class GestorHabitaciones {
                 for(Estadia e : estadiasDeHab){  
                     
                     //Obtengo la lista de estados de esa habitacion. Aca voy a ir agregando las estadias
-                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                     //Obtengo todas las fechas intermedias de la estadia
                     List<String> fechasEstadia = obtenerFechasIntermedias(e.getFechaIngreso(),e.getFechaEgreso()); 
@@ -162,57 +150,38 @@ public class GestorHabitaciones {
                     }
 
                     //Agrego los estados a la lista final de estados
-                    listaEstados.put(hab.getKey(),estados);
+                    listaEstados.put(hab.getIdHabitacion(),estados);
                 }
             }
 
-            
             //Si hay reservas que sean de esa habitacion
-            if(listaReservas.get(hab.getKey()) != null){
-                //Recorro la lista de estadias y voy agregando las mismas a la lista de estados
-                List<ReservaDTO> listaReservasHab = listaReservas.get(hab.getKey());
-                //Para cada objeto ReservaDTO de la habitacion
-                for(ReservaDTO e : listaReservasHab){  
-                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+            for(Reserva reserva : listaReservas){
+                
+                List<FechaReserva> listaFechaReserva = reserva.getListaFechaReserva();
+                for(FechaReserva fr : listaFechaReserva){
+                    
+                    if(fr.getHabitacion().getIdHabitacion() == hab.getIdHabitacion()){
+                        //Hay reserva para la habitacion
+                        //Obtengo la lista de estados de esa habitacion. Aca voy a ir agregando las reservas
+                        List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
-                    //Obtengo todas las fechas intermedias de la estadia
-                    List<String> fechasReserva = obtenerFechasIntermedias(e.getFechaDesde(),e.getFechaHasta());
-                    
-                    //Verifico que todas las fechas de reserva esten disponibles (por si en algun momento alguien ocupa una parte de las fechas de la reserva)
-                    Boolean fechasExistentes = true;
-                    for(String fecha : fechasReserva){
-                        if(!auxFechas.contains(fecha)){
-                            fechasExistentes = false;
-                        }
-                    }
-                    
-                    //Si estan todas las fechas de la reserva, se muestran las fechas como reservadas
-                    if(fechasExistentes){
+                        //Obtengo todas las fechas intermedias de la reserva
+                        List<String> fechasReserva = obtenerFechasIntermedias(fr.getFechaIngreso(),fr.getFechaEgreso()); 
+
                         for(String fecha : fechasReserva){
                             if(auxFechas.indexOf(fecha) != -1){
-                                estados.add(new EstadoHabitacionDTO(e.getIdReserva(), fecha, "Reservada"));
+                                estados.add(new EstadoHabitacionDTO(reserva.getIdReserva(), fecha, "Reservada"));
                                 auxFechas.remove(auxFechas.indexOf(fecha));
                             }  
                         }
+                        
                     }
-                    else{
-                        //Si no estan todas las fechas disponibles, se colocan las demas como "Desocupada" para descartar la reserva
-                        for(String fecha : fechasReserva){
-                            if(auxFechas.indexOf(fecha) != -1){
-                                estados.add(new EstadoHabitacionDTO(0, fecha, "Desocupada"));
-                                auxFechas.remove(auxFechas.indexOf(fecha));
-                            }  
-                        }
-                    }
-                    
-                    
-                    //Agrego los estados a la lista final de estados
-                    listaEstados.put(hab.getKey(),estados);
                 }
             }
+
             
             //Filtro las inhabilitaciones de esa habitacion
-            List<Inhabilitado> inhabilitacionesDeHab = recuperarInhabilitadosDeUnaHabitacion(listaInhabilitados, hab.getKey());
+            List<Inhabilitado> inhabilitacionesDeHab = recuperarInhabilitadosDeUnaHabitacion(listaInhabilitados, hab.getIdHabitacion());
             
             //Si hay inhabilitaciones que sean de esa habitacion
             if(!inhabilitacionesDeHab.isEmpty()){
@@ -220,7 +189,7 @@ public class GestorHabitaciones {
                 for(Inhabilitado e : inhabilitacionesDeHab){  
                     
                     //Obtengo la lista de estados de esa habitacion. Aca voy a ir agregando las inhabilitaciones
-                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+                    List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                     //Obtengo todas las fechas intermedias de la inhabilitacion
                     List<String> fechasInhabilitado = obtenerFechasIntermedias(e.getFechaInicio(),e.getFechaFin());
@@ -233,21 +202,22 @@ public class GestorHabitaciones {
                     }
 
                     //Agrego los estados a la lista final de estados
-                    listaEstados.put(hab.getKey(),estados);
+                    listaEstados.put(hab.getIdHabitacion(),estados);
                 }
             }
             
             //Si hay fechas que no tienen estadia, reserva o inhabilitacion se ponen como desocupadas
             
             while(!auxFechas.isEmpty()){
-                List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getKey());
+                List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
                 estados.add(new EstadoHabitacionDTO(0,auxFechas.get(0),"Desocupada"));
-                listaEstados.put(hab.getKey(), estados);
+                listaEstados.put(hab.getIdHabitacion(), estados);
                 auxFechas.remove(0);
             }       
         }
       
         return listaEstados;
+
     }
     
     public List<Estadia> recuperarEstadiasDeUnaHabitacion(List<Estadia> lista, int idHabitacion) {
@@ -296,7 +266,34 @@ public class GestorHabitaciones {
 
     Habitacion obtenerHabitacion(int idHabitacion) {
         habitacionDAO = new HabitacionDAOImpl();
-        return habitacionDAO.obtenerHabitacion(idHabitacion);
+        Habitacion habitacion = null;
+        
+        try {
+            habitacion = habitacionDAO.obtenerHabitacion(idHabitacion);
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        
+        return habitacion;
+    }
+
+    Boolean validarNroHabitacion(String nroHabitacion) {
+        //Me fijo si existe una habitacion con ese nro
+        habitacionDAO = new HabitacionDAOImpl();
+        return habitacionDAO.buscarNroHabitacion(nroHabitacion);
+    }
+
+    public List<HabitacionDTO> obtenerHabitaciones(String tipoHab) {
+        List<HabitacionDTO> habitaciones = new ArrayList<>();
+        try {
+            List<Habitacion> hab = new TipoHabitacionDAOImpl().obtenerHabitaciones(tipoHab);
+            for(Habitacion h : hab){
+                habitaciones.add(new HabitacionDTO(h.getIdHabitacion(), h.getNumeroHabitacion()));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return habitaciones;
     }
 
     

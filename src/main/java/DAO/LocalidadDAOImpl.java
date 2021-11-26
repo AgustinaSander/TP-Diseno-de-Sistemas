@@ -3,7 +3,6 @@ package DAO;
 
 import static Conexion.Conexion.close;
 import static Conexion.Conexion.getConnection;
-import Dominio.Localidad;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -73,6 +72,7 @@ public class LocalidadDAOImpl implements ILocalidadDAO{
         finally{
             try {
                 close(stmt);
+                close(rs);
                 if(this.conexionTransaccional == null){
                     close(conn);
                 }

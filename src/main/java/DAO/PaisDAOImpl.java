@@ -2,15 +2,13 @@
 package DAO;
 
 import static Conexion.Conexion.*;
-import Dominio.Pais;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class PaisDAOImpl implements IPaisDAO{
     private Connection conexionTransaccional = null;
@@ -43,6 +41,7 @@ public class PaisDAOImpl implements IPaisDAO{
         finally{
             try {
                 close(stmt);
+                close(rs);
                 if(this.conexionTransaccional == null){
                     close(conn);
                 }

@@ -1,11 +1,16 @@
 
 package Validaciones;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.regex.*;
 
 public class Validaciones {
     
-    public static boolean verificarTelefono(String tel){
+    public static Boolean verificarTelefono(String tel){
         Pattern pat = Pattern.compile("^\\+\\d{2}(9)?\\d{10}$");
         Matcher mat = pat.matcher(tel);
         
@@ -15,7 +20,7 @@ public class Validaciones {
         return false;
     }
     
-    public static  boolean esNumero(String num){
+    public static Boolean esNumero(String num){
         try{
             Integer.parseInt(num);
             return true;
@@ -25,7 +30,7 @@ public class Validaciones {
         }
     }
     
-    public static boolean verificarCUIT(String cuit){
+    public static Boolean verificarCUIT(String cuit){
         //Eliminamos todos los caracteres que no son números
         cuit = cuit.replaceAll("[^\\d]", "");
         
@@ -65,7 +70,7 @@ public class Validaciones {
         }
     }
     
-    public static boolean verificarEmail(String email){
+    public static Boolean verificarEmail(String email){
         if(email.length() == 0){
                 return true;
         }
@@ -76,5 +81,26 @@ public class Validaciones {
             return true;
         }
         return false;
+    }
+    
+    public static Boolean verificarHora(String hora){
+        if(hora.length() == 0){
+            return false;
+        }
+        Pattern pat = Pattern.compile("(([0-1]?\\d)|2([0-3])):([0-5]?\\d)");
+        Matcher mat = pat.matcher(hora);
+        if(mat.matches()){
+            return true;
+        }
+        return false;
+    }
+    
+     public static int calcularEdad(Date fechaNac){
+        int edad = 0;
+        LocalDate fecha = Instant.ofEpochMilli(fechaNac.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate ahora = LocalDate.now();
+        Period periodo = Period.between(fecha, ahora);
+        
+        return periodo.getYears();
     }
 }

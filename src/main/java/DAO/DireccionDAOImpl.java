@@ -33,6 +33,11 @@ public class DireccionDAOImpl implements IDireccionDAO{
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
+            //Conexion transaccional
+            if(conn.getAutoCommit()){
+                conn.setAutoCommit(false);
+            }
+            
             //Inserto direccion
             stmt = conn.prepareStatement("INSERT INTO direccion(idLocalidad,calle,numero,departamento,codigoPostal) VALUES (?, ?, ?, ?, ?)");
             stmt.setInt(1,direccion.getLocalidad().getIdLocalidad());
@@ -49,10 +54,11 @@ public class DireccionDAOImpl implements IDireccionDAO{
                 resId = rs.getInt("MAX(idDireccion)");
             }
             
+            conn.commit();
         }finally{
             try {
-                close(stmt);
                 close(rs);
+                close(stmt);
                 if(this.conexionTransaccional == null){
                     close(conn);
                 }
