@@ -2,7 +2,9 @@
 package Gestores;
 
 import DAO.EstadiaDAOImpl;
+import DAO.FacturaDAOImpl;
 import DAO.IEstadiaDAO;
+import DAO.IFacturaDAO;
 import DAO.IServicioDAO;
 import DAO.ServicioDAOImpl;
 import Dominio.DTO.EstadiaDTO;
@@ -11,6 +13,7 @@ import Dominio.DTO.PasajeroDTO;
 import Dominio.DTO.ServicioDTO;
 
 import Dominio.Estadia;
+import Dominio.Factura;
 import Dominio.Habitacion;
 import Dominio.OcupadaPor;
 import Dominio.Pasajero;
@@ -22,8 +25,9 @@ import static Validaciones.Validaciones.verificarHora;
 import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class GestorEstadias {
@@ -101,7 +105,7 @@ public class GestorEstadias {
         Estadia e = estadiaDAO.obtenerUltimaEstadia(nroHabitacion);
         
         //Creo la estadiaDTO
-        EstadiaDTO estadia = new EstadiaDTO(e.getIdEstadia(), e.getHabitacion().getIdHabitacion(), e.getHabitacion().getTipo().getIdTipoHabitacion(), e.getHabitacion().getTipo().getNombre(), e.getFechaIngreso(), e.getFechaEgreso(), e.getHabitacion().getPrecio());
+        EstadiaDTO estadia = new EstadiaDTO(e.getHabitacion().getIdHabitacion(), e.getFechaIngreso(), e.getFechaEgreso());
         
         List<PasajeroDTO> listaPasajeros = new ArrayList<>();
         for(OcupadaPor o : e.getListaOcupadaPor()){
@@ -118,8 +122,28 @@ public class GestorEstadias {
         List<ServicioDTO> servicios = new ArrayList<>();
         
         IServicioDAO servicioDAO = new ServicioDAOImpl();
-        List<Servicio> serviciosEstadia = servicioDAO.obtenerServicios(idEstadia);
+        List<Servicio> serviciosEstadia = new ArrayList<>();
+        try {
+            serviciosEstadia = servicioDAO.obtenerServiciosEstadia(idEstadia);
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
         
+        //Recupero las facturas de esa estadia
+        List<Factura> facturasEstadia = obtenerFacturas(idEstadia);
+
         return servicios;
+    }
+    
+    public List<Factura> obtenerFacturas(int idEstadia){
+        IFacturaDAO facturaDAO = new FacturaDAOImpl();
+        List<Factura> facturas = new ArrayList<>();
+        try {
+            facturas = facturaDAO.obtenerFacturasEstadia(idEstadia);
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        
+        return facturas;
     }
 }

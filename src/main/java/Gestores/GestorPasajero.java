@@ -14,7 +14,10 @@ import static Validaciones.Validaciones.verificarTelefono;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GestorPasajero {
     private static GestorPasajero instanciaGPasajero = null;
@@ -124,37 +127,32 @@ public class GestorPasajero {
     
     //Verificar si existe un pasajero con mismo tipoDoc y numDoc
     public boolean verificarExistenciaPasajero(PasajeroDTO pasajeroDTO){
-        Boolean existe = false;
+        List<Pasajero> pasajerosExistentes = new ArrayList<>();
         
         pasajeroDAO = new PasajeroDAOImpl();
         try {
-            existe = pasajeroDAO.verificarExistenciaPasajero(pasajeroDTO.getTipoDoc().name(),pasajeroDTO.getNumDoc());
+            pasajerosExistentes = pasajeroDAO.verificarExistenciaPasajero(pasajeroDTO.getTipoDoc().name(),pasajeroDTO.getNumDoc());
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
         
-        return existe;
+        if(pasajerosExistentes.size() > 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     
     public Pasajero crearObjetoPasajero(PasajeroDTO pasajeroDTO){
         
         //DEVOLVER TODO EL OBJETO
-        //Creo el objeto de pais
-        int idPais = getInstanceGeo().obtenerIdPais(pasajeroDTO.getPais());
-        Pais pais = new Pais(idPais, pasajeroDTO.getPais(),pasajeroDTO.getPais());
         //Creo el objeto nacionalidad
-        int idNacionalidad = getInstanceGeo().obtenerIdPais(pasajeroDTO.getNacionalidad());
-        Pais nacionalidad = new Pais(idNacionalidad,pasajeroDTO.getNacionalidad(),pasajeroDTO.getNacionalidad());
-        //Creo el objeto provincia
-        int idProvincia = getInstanceGeo().obtenerIdProvincia(pasajeroDTO.getProvincia(),idPais);
-        Provincia provincia = new Provincia(idProvincia, pais, pasajeroDTO.getProvincia());
+        Pais nacionalidad = getInstanceGeo().obtenerPais(pasajeroDTO.getNacionalidad());
         //Creo el objeto localidad
-        int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad(), pasajeroDTO.getProvincia(), pasajeroDTO.getPais());
-        Localidad localidad = new Localidad(idLocalidad, provincia, pasajeroDTO.getLocalidad());
-
+        Localidad localidad = getInstanceGeo().obtenerLocalidad(pasajeroDTO.getLocalidad(), pasajeroDTO.getProvincia(), pasajeroDTO.getPais());
         //Creo el objeto direccion
         Direccion direccion = new Direccion(pasajeroDTO.getIdDireccion(), localidad, pasajeroDTO.getCalle(), Integer.parseInt(pasajeroDTO.getNumero()), pasajeroDTO.getDepartamento(), Integer.parseInt(pasajeroDTO.getCodigoPostal()));
-        
         //Creo el objeto pasajero
         Pasajero pasajero = new Pasajero(pasajeroDTO.getApellido(),pasajeroDTO.getNombre(),pasajeroDTO.getTipoDoc(),pasajeroDTO.getNumDoc(),pasajeroDTO.getFechaNac(), pasajeroDTO.getEmail(),pasajeroDTO.getOcupacion(),nacionalidad,pasajeroDTO.getIdPersona(),pasajeroDTO.getCUIT(),pasajeroDTO.getPosIva(),pasajeroDTO.getTelefono(),direccion);
         
@@ -165,21 +163,7 @@ public class GestorPasajero {
     public boolean crearPasajero(PasajeroDTO pasajeroDTO) throws ParseException{
         try {
             //Creo un objeto Pasajero con los datos de pasajeroDTO
-            Pasajero pasajero = new Pasajero(pasajeroDTO.getApellido(), pasajeroDTO.getNombre(), pasajeroDTO.getTipoDoc(),pasajeroDTO.getNumDoc(), pasajeroDTO.getFechaNac(), pasajeroDTO.getEmail(), pasajeroDTO.getOcupacion(), pasajeroDTO.getCUIT(), pasajeroDTO.getPosIva(), pasajeroDTO.getTelefono());
-            
-            //Obtengo el id del pais que va a ser la nacionalidad y creo un objeto Pais
-            int idNacionalidad = getInstanceGeo().obtenerIdPais(pasajeroDTO.getNacionalidad());
-            Pais nacionalidad = new Pais(idNacionalidad);
-            pasajero.setNacionalidad(nacionalidad);
-            
-            //Obtengo el id de la localidad y creo un objeto Localidad
-            int idLocalidad = getInstanceGeo().obtenerIdLocalidad(pasajeroDTO.getLocalidad(), pasajeroDTO.getProvincia(), pasajeroDTO.getPais());
-            Localidad localidad = new Localidad(idLocalidad);
-            
-            //Creo objeto direccion 
-            Direccion direccion = new Direccion(localidad, pasajeroDTO.getCalle(), Integer.parseInt(pasajeroDTO.getNumero()), pasajeroDTO.getDepartamento(), Integer.parseInt(pasajeroDTO.getCodigoPostal()));
-            
-            pasajero.setDireccion(direccion);
+            Pasajero pasajero = crearObjetoPasajero(pasajeroDTO);
             //PasajeroDAO crea el pasajero 
             pasajeroDAO.crearPasajero(pasajero);
 
@@ -193,7 +177,8 @@ public class GestorPasajero {
     
     //Buscar pasajeros cuyos datos coincidan con los criterios de busqueda
     public List<GestionarPasajeroDTO> buscarPasajeros(GestionarPasajeroDTO busquedaDTO){
-        List <GestionarPasajeroDTO> listaPasajerosEncontrados = null;
+        List<Pasajero> listaPasajerosEncontrados = new ArrayList<>();
+        List<GestionarPasajeroDTO> listaGestionar = new ArrayList<>();
         try {
 
             pasajeroDAO = new PasajeroDAOImpl();
@@ -212,11 +197,16 @@ public class GestorPasajero {
             //PasajeroDAO obtiene los pasajeros que coincidan con los criterios de busqueda
             listaPasajerosEncontrados = pasajeroDAO.obtenerPasajeros(busquedaDTO);
             
+            //Convierto los pasajeros encontrados en GestionarPasajeroDTO
+            for(Pasajero p : listaPasajerosEncontrados){
+                listaGestionar.add(new GestionarPasajeroDTO(p.getIdPersona(), p.getDireccion().getIdDireccion(), p.getNombre(), p.getApellido(), p.getTipoDoc(), p.getNumDoc(), p.getFechaNac()));
+            }
+            
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
        
-        return listaPasajerosEncontrados;
+        return listaGestionar;
     }
    
     //Modificar pasajero
@@ -234,7 +224,12 @@ public class GestorPasajero {
     
     public PasajeroDTO buscarPasajero(int idPasajero){
         pasajeroDAO = new PasajeroDAOImpl();
-        Pasajero pasajero = pasajeroDAO.obtenerPasajero(idPasajero);
+        Pasajero pasajero = null;
+        try {
+            pasajero = pasajeroDAO.obtenerPasajero(idPasajero);
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
         
         //Creo el objeto pasajeroDTO a partir de pasajero
         PasajeroDTO pasajeroDTO = new PasajeroDTO(pasajero.getApellido(), pasajero.getNombre(), pasajero.getTipoDoc(), pasajero.getNumDoc(), pasajero.getFechaNac(), pasajero.getEmail(), pasajero.getOcupacion(),pasajero.getNacionalidad().getNombrePais(),pasajero.getCUIT(),pasajero.getPosIva(),pasajero.getTelefono(), pasajero.getDireccion().getLocalidad().getProvincia().getPais().getNombrePais(),pasajero.getDireccion().getLocalidad().getProvincia().getNombreProvincia(), pasajero.getDireccion().getLocalidad().getNombreLocalidad(), pasajero.getDireccion().getCalle(),String.valueOf(pasajero.getDireccion().getNumero()),pasajero.getDireccion().getDepartamento(), String.valueOf(pasajero.getDireccion().getCodigoPostal()));
@@ -244,6 +239,13 @@ public class GestorPasajero {
     
     public Pasajero obtenerPasajero(int idPasajero){
         pasajeroDAO = new PasajeroDAOImpl();
-        return pasajeroDAO.obtenerPasajero(idPasajero);
+        Pasajero pas = null;
+        try {
+            pas = pasajeroDAO.obtenerPasajero(idPasajero);
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        
+        return pas;
     }
 }

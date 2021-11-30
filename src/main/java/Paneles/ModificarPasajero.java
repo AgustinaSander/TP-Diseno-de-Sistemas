@@ -527,7 +527,7 @@ public class ModificarPasajero extends javax.swing.JDialog {
         String seleccion = (String) provinciaCombo.getSelectedItem();
         List <String> localidades = null;
         //Le pido al gestorGeografico las localidades de la provincia seleccionada
-        if(!"Seleccionar".equals(seleccion)){
+        if(!"Seleccionar".equals(seleccion) && !(seleccion == null)){
             localidades = getInstanceGeo().obtenerLocalidades(seleccion, (String) paisCombo.getSelectedItem());
             Collections.sort(localidades);
             localidadCombo.removeAllItems();

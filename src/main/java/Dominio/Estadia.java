@@ -13,6 +13,8 @@ public class Estadia {
     private LocalTime horaEgreso;
     private Habitacion habitacion;
     private List<OcupadaPor> listaOcupadaPor;
+    private List<Servicio> listaServicios;
+    private List<Factura> listaFacturas;
     
     public Estadia() {
     }
@@ -34,6 +36,18 @@ public class Estadia {
         this.horaEgreso = horaEgreso;
         this.habitacion = habitacion;
         this.listaOcupadaPor = listaOcupadaPor;
+    }
+
+    public Estadia(int idEstadia, Date fechaIngreso, LocalTime horaIngreso, Date fechaEgreso, LocalTime horaEgreso, Habitacion habitacion, List<OcupadaPor> listaOcupadaPor, List<Servicio> listaServicios, List<Factura> listaFacturas) {
+        this.idEstadia = idEstadia;
+        this.fechaIngreso = fechaIngreso;
+        this.horaIngreso = horaIngreso;
+        this.fechaEgreso = fechaEgreso;
+        this.horaEgreso = horaEgreso;
+        this.habitacion = habitacion;
+        this.listaOcupadaPor = listaOcupadaPor;
+        this.listaServicios = listaServicios;
+        this.listaFacturas = listaFacturas;
     }
 
     
@@ -94,14 +108,27 @@ public class Estadia {
         this.listaOcupadaPor = listaOcupadaPor;
     }
 
-    @Override
-    public String toString() {
-        return "Estadia{" + "idEstadia=" + idEstadia + ", fechaIngreso=" + fechaIngreso + ", horaIngreso=" + horaIngreso + ", fechaEgreso=" + fechaEgreso + ", horaEgreso=" + horaEgreso + ", habitacion=" + habitacion + ", listaOcupadaPor=" + listaOcupadaPor + '}';
+    public List<Servicio> getListaServicios() {
+        return listaServicios;
     }
 
-    
+    public void setListaServicios(List<Servicio> listaServicios) {
+        this.listaServicios = listaServicios;
+    }
 
-  
+    public List<Factura> getListaFacturas() {
+        return listaFacturas;
+    }
+
+    public void setListaFacturas(List<Factura> listaFacturas) {
+        this.listaFacturas = listaFacturas;
+    }
+
+    @Override
+    public String toString() {
+        return "Estadia{" + "idEstadia=" + idEstadia + ", fechaIngreso=" + fechaIngreso + ", horaIngreso=" + horaIngreso + ", fechaEgreso=" + fechaEgreso + ", horaEgreso=" + horaEgreso + ", habitacion=" + habitacion + ", listaOcupadaPor=" + listaOcupadaPor + ", listaServicios=" + listaServicios + ", listaFacturas=" + listaFacturas + '}';
+    }
+ 
     
     
 }

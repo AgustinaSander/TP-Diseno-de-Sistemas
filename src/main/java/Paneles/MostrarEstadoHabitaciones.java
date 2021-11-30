@@ -5,6 +5,7 @@ import Dominio.DTO.EstadiaDTO;
 import Dominio.DTO.EstadoHabitacionDTO;
 import Dominio.DTO.HabitacionDTO;
 import Dominio.DTO.ReservaDTO;
+import Dominio.DTO.TipoDeHabitacionDTO;
 import static Gestores.GestorHabitaciones.getInstanceHabitaciones;
 import static Gestores.GestorReservas.getInstanceReservas;
 import java.awt.BorderLayout;
@@ -33,14 +34,14 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         this.hasta = fechaHasta;
         
         //Obtenemos los tipos de habitaciones disponibles
-        List <String> tipoDeHabitaciones = getInstanceHabitaciones().obtenerTiposDeHabitaciones();
+        List <TipoDeHabitacionDTO> tipoDeHabitaciones = getInstanceHabitaciones().obtenerTiposDeHabitaciones();
 
         JComboBox tipoHabCombo = new JComboBox();
         this.tipoHab = tipoHabCombo;
         tipoHabCombo.setBounds(40,60,800,20);
         this.add(tipoHabCombo, BorderLayout.CENTER);
-        for(String tipo: tipoDeHabitaciones){
-            tipoHabCombo.addItem(tipo);
+        for(TipoDeHabitacionDTO tipo: tipoDeHabitaciones){
+            tipoHabCombo.addItem(tipo.getNombre());
         }
         tipoHabCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,7 +81,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         String [] nombreColumnas = new String[habitaciones.size()+1];
         nombreColumnas[0] = "Fecha";
         for(int i=1; i<=habitaciones.size(); i++){
-            nombreColumnas[i] = habitaciones.get(i-1).getNombre();
+            nombreColumnas[i] = habitaciones.get(i-1).getNumero();
         }
         Object[][] datos = new Object [listaFechas.size()][habitaciones.size()+1];
         

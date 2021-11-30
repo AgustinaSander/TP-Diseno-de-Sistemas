@@ -2,6 +2,8 @@
 package DAO;
 
 import static Conexion.Conexion.*;
+import Dominio.Pais;
+import Dominio.Provincia;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,18 +26,18 @@ public class PaisDAOImpl implements IPaisDAO{
     }
     
     @Override
-    public int obtenerIdPais(String nombre) throws SQLException{
-        int idPais = 0;
+    public Pais obtenerPais(String nombre) throws SQLException{
+        Pais pais = null;
         try {
             //Si necesito aplicar transacciones
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
-            stmt = conn.prepareStatement("SELECT id FROM pais WHERE paisnombre = ?");
+            stmt = conn.prepareStatement("SELECT * FROM pais WHERE paisnombre = ?");
             stmt.setString(1,nombre);
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                idPais = rs.getInt("id");
+                pais = new Pais(rs.getInt("id"), rs.getString("paisnombre"), rs.getString("nacionalidad"));
             }
         } 
         finally{
@@ -50,20 +52,20 @@ public class PaisDAOImpl implements IPaisDAO{
             }
         }
         
-        return idPais;
+        return pais;
     }
     
     @Override
     //Obtengo los nombres de todos los paises de la bd
-    public List<String> obtenerPaises() throws SQLException{
-        List <String> listaPaises = new ArrayList();
+    public List<Pais> obtenerPaises() throws SQLException{
+        List <Pais> listaPaises = new ArrayList();
         
         try{
             conn = getConnection();
-            stmt = conn.prepareStatement("SELECT paisnombre FROM pais");
+            stmt = conn.prepareStatement("SELECT * FROM pais");
             rs = stmt.executeQuery();
             while(rs.next()){
-                listaPaises.add(rs.getString("paisnombre"));
+                listaPaises.add(new Pais(rs.getInt("id"), rs.getString("paisnombre"), rs.getString("nacionalidad")));
             }
         }finally{
              try {
@@ -79,18 +81,19 @@ public class PaisDAOImpl implements IPaisDAO{
     }
     
     @Override
-    //Obtener nacionalidad a partir del idPais
-    public String obtenerNacionalidad(int idPais) throws SQLException{
-        String nacionalidad = "";
+    //Obtener pais de nacionalidad de una persona
+    public Pais obtenerNacionalidad(int idPersona) throws SQLException{
+        Pais nacionalidad = null;
         
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
-            stmt = conn.prepareStatement("SELECT * FROM pais WHERE idPais = ?");
-            stmt.setInt(1,idPais);
+            
+            stmt = conn.prepareStatement("SELECT p.* FROM pasajero AS pas, pais AS p WHERE pas.idPersona = ? AND pas.idPais = p.id");
+            stmt.setInt(1,idPersona);
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                nacionalidad = rs.getString("nacionalidad");
+                nacionalidad = new Pais(rs.getInt("id"), rs.getString("paisnombre"), rs.getString("nacionalidad"));
             }
         }finally{
             try {
@@ -107,23 +110,23 @@ public class PaisDAOImpl implements IPaisDAO{
     }
     
     @Override
-    //Obtener el nombre del pais con id = idPais
-    public String obtenerPais(int idPais) throws SQLException{
-        String nacionalidad = "";
+    //Obtener el pais con idPais
+    public Pais obtenerPais(int idPais) throws SQLException{
+        Pais pais = null;
         
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
-            stmt = conn.prepareStatement("SELECT * FROM pais WHERE idPais = ?");
+            
+            stmt = conn.prepareStatement("SELECT * FROM pais WHERE id = ?");
             stmt.setInt(1,idPais);
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                nacionalidad = rs.getString("nombrePais");
+                pais = new Pais(rs.getInt("id"), rs.getString("paisnombre"), rs.getString("nacionalidad"));
             }
         }finally{
             try {
                 close(stmt);
-                close(rs);
                 if(this.conexionTransaccional == null){
                     close(conn);
                 }
@@ -131,29 +134,31 @@ public class PaisDAOImpl implements IPaisDAO{
                 ex.printStackTrace(System.out);
             }
         }
-        return nacionalidad;
+        
+        return pais;
     }
     
     @Override
     //Obtener las provincias que componen un pais a partir del nombre del pais
-    public List<String> obtenerProvincias(String pais) throws SQLException{
-        List <String> listaProvincias = new ArrayList();
+    public List<Provincia> obtenerProvincias(String pais) throws SQLException{
+        List <Provincia> listaProvincias = new ArrayList();
         
         try {
             this.conexionTransaccional = getConnection();
             
             //Obtengo el idPais
-            int idPais = obtenerIdPais(pais);
+            Pais p = obtenerPais(pais);
+            int idPais = p.getIdPais();
             
             //Obtengo las provincias que lo componen
-            stmt = conn.prepareStatement("SELECT estadonombre FROM estado WHERE ubicacionpaisid = ?");
+            stmt = conn.prepareStatement("SELECT * FROM estado WHERE ubicacionpaisid = ?");
             stmt.setInt(1,idPais);
             rs = stmt.executeQuery();
             while(rs.next()){
-                listaProvincias.add(rs.getString("estadonombre"));
+                listaProvincias.add(new Provincia(rs.getInt("id"), p ,rs.getString("estadonombre")));
             }
         } finally{
-             try {
+            try {
                 close(stmt);
                 close(rs);
                 if(this.conexionTransaccional == null){

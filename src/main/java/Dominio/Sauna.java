@@ -18,11 +18,6 @@ public class Sauna extends Servicio{
         super(idServicio, descripcion, fecha, precioTotal, cantidad);
         this.precioUnitario = precioUnitario;
     }
-    
-    public Sauna(float precioUnitario, int idServicio, String descripcion, Date fecha, float precioTotal, int cantidad, Estadia estadia, List<ItemServicio> listaItemsServicios) {
-        super(idServicio, descripcion, fecha, precioTotal, cantidad, estadia, listaItemsServicios);
-        this.precioUnitario = precioUnitario;
-    }
 
     public float getPrecioUnitario() {
         return precioUnitario;
@@ -72,25 +67,9 @@ public class Sauna extends Servicio{
         this.cantidad = cantidad;
     }
 
-    public Estadia getEstadia() {
-        return estadia;
-    }
-
-    public void setEstadia(Estadia estadia) {
-        this.estadia = estadia;
-    }
-
-    public List<ItemServicio> getListaItemsServicios() {
-        return listaItemsServicios;
-    }
-
-    public void setListaItemsServicios(List<ItemServicio> listaItemsServicios) {
-        this.listaItemsServicios = listaItemsServicios;
-    }
-
     @Override
     public String toString() {
-        return "Sauna{" + "precioUnitario=" + precioUnitario + '}';
+        return "Sauna{" + "precioUnitario=" + precioUnitario +"} Servicio{ "+ super.toString() +'}';
     }
     
     

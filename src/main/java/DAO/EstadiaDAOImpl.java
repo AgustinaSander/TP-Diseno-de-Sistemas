@@ -5,9 +5,11 @@ import static Conexion.Conexion.close;
 import static Conexion.Conexion.getConnection;
 import Dominio.Direccion;
 import Dominio.Estadia;
+import Dominio.Factura;
 import Dominio.Habitacion;
 import Dominio.OcupadaPor;
 import Dominio.Pasajero;
+import Dominio.Servicio;
 import Dominio.TipoDeHabitacion;
 import Enum.PosicionIVA;
 import Enum.TipoDocumento;
@@ -15,6 +17,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EstadiaDAOImpl implements IEstadiaDAO{
 
@@ -24,7 +28,7 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
     private ResultSet rs = null;
     
     @Override
-    public List<Estadia> obtenerListaEstadias(List<Habitacion> habitaciones, Date fechaDesde, Date fechaHasta) throws SQLException{
+    public List<Estadia> obtenerListaEstadias(Habitacion hab, Date fechaDesde, Date fechaHasta) throws SQLException{
         List<Estadia> listaEstadias = new ArrayList <>();
         try {
             conn = getConnection();
@@ -36,32 +40,38 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
             
             java.sql.Date desde = new java.sql.Date(fechaDesde.getTime());
             java.sql.Date hasta = new java.sql.Date(fechaHasta.getTime());
-            
-            for(Habitacion h : habitaciones){
-                stmt = conn.prepareStatement("SELECT e.*, h.* FROM estadia AS e, habitacion AS h WHERE e.idHabitacion = ? AND h.id = ? AND (((e.fechaIngreso <= ?) AND (e.fechaEgreso >= ?)) OR ((e.fechaIngreso <= ?) AND (e.fechaEgreso BETWEEN ? AND ?)) OR ((e.fechaIngreso BETWEEN ? AND ?) AND (e.fechaEgreso BETWEEN ? AND ?)) OR ((e.fechaIngreso >= ?) AND (e.fechaEgreso >= ?)))");
-                stmt.setInt(1,h.getIdHabitacion());
-                stmt.setInt(2,h.getIdHabitacion());
-                stmt.setDate(3,desde);
-                stmt.setDate(4,hasta);
-                stmt.setDate(5,desde);
-                stmt.setDate(6,desde);
-                stmt.setDate(7,hasta);
-                stmt.setDate(8,desde);
-                stmt.setDate(9,hasta);
-                stmt.setDate(10,desde);
-                stmt.setDate(11,hasta);
-                stmt.setDate(12,desde);
-                stmt.setDate(13,hasta);
-                
-                rs = stmt.executeQuery();
-                
-                while(rs.next()){ 
-                    //Creo el objeto estadia
-                    Estadia estadia = new Estadia(rs.getInt("id"), rs.getDate("fechaIngreso"), rs.getTime("horaIngreso").toLocalTime(), rs.getDate("fechaEgreso"), rs.getTime("horaEgreso").toLocalTime(), h);
 
-                    //Agrego la estadia a la lista
-                    listaEstadias.add(estadia);
-                }
+            stmt = conn.prepareStatement("SELECT e.*, h.* FROM estadia AS e, habitacion AS h WHERE e.idHabitacion = ? AND h.id = ? AND (((e.fechaIngreso <= ?) AND (e.fechaEgreso >= ?)) OR ((e.fechaIngreso <= ?) AND (e.fechaEgreso BETWEEN ? AND ?)) OR ((e.fechaIngreso BETWEEN ? AND ?) AND (e.fechaEgreso BETWEEN ? AND ?)) OR ((e.fechaIngreso >= ?) AND (e.fechaEgreso >= ?)))");
+            stmt.setInt(1,hab.getIdHabitacion());
+            stmt.setInt(2,hab.getIdHabitacion());
+            stmt.setDate(3,desde);
+            stmt.setDate(4,hasta);
+            stmt.setDate(5,desde);
+            stmt.setDate(6,desde);
+            stmt.setDate(7,hasta);
+            stmt.setDate(8,desde);
+            stmt.setDate(9,hasta);
+            stmt.setDate(10,desde);
+            stmt.setDate(11,hasta);
+            stmt.setDate(12,desde);
+            stmt.setDate(13,hasta);
+
+            rs = stmt.executeQuery();
+
+            while(rs.next()){ 
+                //Creo el objeto estadia
+                Estadia estadia = new Estadia(rs.getInt("id"), rs.getDate("fechaIngreso"), rs.getTime("horaIngreso").toLocalTime(), rs.getDate("fechaEgreso"), rs.getTime("horaEgreso").toLocalTime(), hab);
+                //Busco los ocupantes de la estadia con PasajeroDAO
+                List<OcupadaPor> ocupantes = new PasajeroDAOImpl(conn).obtenerOcupantesEstadia(estadia.getIdEstadia());
+                estadia.setListaOcupadaPor(ocupantes);
+                //Busco los servicios de la estadia
+                List<Servicio> servicios = new ServicioDAOImpl(conn).obtenerServiciosEstadia(estadia.getIdEstadia());
+                estadia.setListaServicios(servicios);
+                //Busco las facturas de la estadia
+                List<Factura> facturas = new FacturaDAOImpl(conn).obtenerFacturasEstadia(estadia.getIdEstadia());
+                estadia.setListaFacturas(facturas);
+                //Agrego la estadia a la lista
+                listaEstadias.add(estadia);
             }
             
             conn.commit();
@@ -179,35 +189,41 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
         try {
             //Se obtiene la ultima estadia de esa habitacion
             conn = getConnection();
-            
-            stmt = conn.prepareStatement("SELECT *, e.id AS idEstadia, th.nombre AS nombreTipo, p.nombre AS nombrePasajero, h.precio AS precioHabitacion FROM estadia AS e, habitacion AS h, ocupadapor AS o, pasajero AS p, tipodehabitacion AS th, persona AS per WHERE h.nro =? AND h.id = e.idHabitacion AND e.id =o.idEstadia AND o.idPersona = p.idPersona AND th.id = h.idTipoHabitacion AND o.idPersona = per.idPersona AND fechaEgreso = (SELECT MAX(fechaEgreso) FROM estadia AS e WHERE h.nro = ? AND h.id = e.idHabitacion);");
-            stmt.setString(1,nroHabitacion);
-            stmt.setString(2,nroHabitacion);
-            
-            rs = stmt.executeQuery();
-            List<OcupadaPor> listaOcupadaPor = new ArrayList<>();
-            
-            while(rs.next()){
-                //Tengo que setear la estadia
-                Pasajero p = new Pasajero(rs.getString("apellido"), rs.getString("nombrePasajero"), TipoDocumento.valueOf(rs.getString("tipoDoc")), rs.getString("numDoc"), rs.getDate("fechaNac"), rs.getString("email"), rs.getString("ocupacion"), null, rs.getInt("idPersona"), rs.getString("CUIT"), PosicionIVA.valueOf(rs.getString("posIVA")), rs.getString("telefono"), null);
-                
-                OcupadaPor op = new OcupadaPor(p, rs.getBoolean("esResponsable"));
-                listaOcupadaPor.add(op);
-                
-                //Seteo la habitacion
-                Habitacion hab = new Habitacion(rs.getInt("idHabitacion"), rs.getString("nro"), rs.getFloat("precio"), new TipoDeHabitacion(rs.getInt("idTipoHabitacion"), rs.getString("nombreTipo"), rs.getFloat("precioHabitacion")));
-                
-                //Seteo estadia
-                estadia.setIdEstadia(rs.getInt("idEstadia"));
-                estadia.setFechaIngreso(rs.getDate("fechaIngreso"));
-                estadia.setFechaEgreso(rs.getDate("fechaEgreso"));
-                estadia.setHoraEgreso(rs.getTime("horaEgreso").toLocalTime());
-                estadia.setHoraIngreso(rs.getTime("horaIngreso").toLocalTime());
-                estadia.setHabitacion(hab);
-                estadia.setListaOcupadaPor(listaOcupadaPor);
-                
+            //Conexion transaccional
+            if(conn.getAutoCommit()){
+                conn.setAutoCommit(false);
             }
             
+            //Obtengo la habitacion
+            Habitacion habitacion = new HabitacionDAOImpl(conn).obtenerHabitacion(nroHabitacion);
+            estadia.setHabitacion(habitacion);
+            
+            //Obtengo la ultima estadia
+            stmt = conn.prepareStatement("SELECT * FROM estadia AS e, habitacion AS h WHERE h.id = ? AND h.id = e.idHabitacion AND e.fechaEgreso = (SELECT MAX(fechaEgreso) FROM estadia AS e WHERE h.id = ? AND h.id = e.idHabitacion)");
+            stmt.setInt(1, habitacion.getIdHabitacion());
+            stmt.setInt(2, habitacion.getIdHabitacion());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                estadia.setIdEstadia(rs.getInt("id"));
+                estadia.setFechaEgreso(rs.getDate("fechaEgreso"));
+                estadia.setFechaIngreso(rs.getDate("fechaIngreso"));
+                estadia.setHoraEgreso(rs.getTime("horaEgreso").toLocalTime());
+                estadia.setHoraIngreso(rs.getTime("horaIngreso").toLocalTime());
+            }
+            
+            //Obtengo la lista de ocupadaPor
+            List<OcupadaPor> listaOcupadaPor = obtenerOcupantesEstadia(estadia.getIdEstadia());
+            estadia.setListaOcupadaPor(listaOcupadaPor);
+            
+            //Obtengo la lista de servicios
+            List<Servicio> listaServicios = new ServicioDAOImpl(conn).obtenerServiciosEstadia(estadia.getIdEstadia());
+            estadia.setListaServicios(listaServicios);
+            
+            //Obtengo la lista de facturas
+            List<Factura> listaFacturas = new FacturaDAOImpl(conn).obtenerFacturasEstadia(estadia.getIdEstadia());
+            estadia.setListaFacturas(listaFacturas);
+            
+            conn.commit();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out); 
         } finally{
@@ -222,5 +238,42 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
         
         return estadia;
     }
+
+    public List<OcupadaPor> obtenerOcupantesEstadia(int idEstadia) throws SQLException{
+        List<OcupadaPor> listaOcupadaPor = new ArrayList<>();
+        try {
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+            
+            stmt = conn.prepareStatement("SELECT * FROM ocupadapor WHERE idEstadia = ?");
+            stmt.setInt(1, idEstadia);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                OcupadaPor ocupadaPor = new OcupadaPor();
+                //Obtengo el objeto pasajero
+                Pasajero pas = new PasajeroDAOImpl(conn).obtenerPasajero(rs.getInt("idPersona"));
+                ocupadaPor.setPasajero(pas);
+                ocupadaPor.setEsResponsable(rs.getBoolean("esResponsable"));
+                
+                listaOcupadaPor.add(ocupadaPor);
+            }
+            
+            
+        }finally{
+            try {
+                if(this.conexionTransaccional == null){
+                    close(stmt);
+                    close(rs);
+                    
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
+        return listaOcupadaPor;
+    }
+
+   
     
 }

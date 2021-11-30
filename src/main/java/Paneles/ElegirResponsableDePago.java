@@ -273,7 +273,7 @@ public class ElegirResponsableDePago extends javax.swing.JDialog {
             ultimaEstadia = getInstanceEstadias().obtenerUltimaEstadia(nroHabField.getText());
             listaOcupantes = ultimaEstadia.getListaPasajeros();
             
-            System.out.println(ultimaEstadia);
+            //System.out.println(ultimaEstadia);
             
             DefaultTableModel tabla = (DefaultTableModel) tablaOcupantes.getModel();
             tabla.setRowCount(0);

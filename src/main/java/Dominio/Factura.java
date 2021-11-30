@@ -11,8 +11,7 @@ public abstract class Factura {
     protected float importeTotal;
     protected Boolean pagada;
     protected Persona persona;
-    protected List<ItemFactura> listaItemsFactura;
-    protected Estadia estadia;
+    protected NotaDeCredito notaCredito;
 
     public Factura() {
     }
@@ -25,18 +24,25 @@ public abstract class Factura {
         this.pagada = pagada;
     }
 
-    public Factura(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, List<ItemFactura> listaItemsFactura, Estadia estadia) {
+    public Factura(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona) {
         this.idFactura = idFactura;
         this.fecha = fecha;
         this.importeNeto = importeNeto;
         this.importeTotal = importeTotal;
         this.pagada = pagada;
         this.persona = persona;
-        this.listaItemsFactura = listaItemsFactura;
-        this.estadia = estadia;
     }
 
-    
+    public Factura(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito) {
+        this.idFactura = idFactura;
+        this.fecha = fecha;
+        this.importeNeto = importeNeto;
+        this.importeTotal = importeTotal;
+        this.pagada = pagada;
+        this.persona = persona;
+        this.notaCredito = notaCredito;
+    }
+
     public int getIdFactura() {
         return idFactura;
     }
@@ -85,27 +91,17 @@ public abstract class Factura {
         this.persona = persona;
     }
 
-    public List<ItemFactura> getListaItemsFactura() {
-        return listaItemsFactura;
+    public NotaDeCredito getNotaCredito() {
+        return notaCredito;
     }
 
-    public void setListaItemsFactura(List<ItemFactura> listaItemsFactura) {
-        this.listaItemsFactura = listaItemsFactura;
-    }
-
-    public Estadia getEstadia() {
-        return estadia;
-    }
-
-    public void setEstadia(Estadia estadia) {
-        this.estadia = estadia;
+    public void setNotaCredito(NotaDeCredito notaCredito) {
+        this.notaCredito = notaCredito;
     }
 
     @Override
     public String toString() {
-        return "Factura{" + "idFactura=" + idFactura + ", fecha=" + fecha + ", importeNeto=" + importeNeto + ", importeTotal=" + importeTotal + ", pagada=" + pagada + ", persona=" + persona + ", listaItemsFactura=" + listaItemsFactura + ", estadia=" + estadia + '}';
+        return "Factura{" + "idFactura=" + idFactura + ", fecha=" + fecha + ", importeNeto=" + importeNeto + ", importeTotal=" + importeTotal + ", pagada=" + pagada + ", persona=" + persona + ", notaCredito=" + notaCredito + '}';
     }
-
-    
     
 }

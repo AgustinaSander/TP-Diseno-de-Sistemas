@@ -7,13 +7,8 @@ import Enum.TipoDocumento;
 import static Gestores.GestorEstadias.getInstanceEstadias;
 import static Gestores.GestorPasajero.*;
 import static Validaciones.Validaciones.calcularEdad;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
@@ -258,6 +253,7 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
         
         //El gestor de pasajeros realiza la busqueda 
         resPasajeros = getInstancePasajero().buscarPasajeros(busquedaDTO);
+        
         DefaultTableModel tabla = (DefaultTableModel) resultadosTabla.getModel();
         tabla.setRowCount(0);
         resultadosTabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -333,7 +329,7 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
                         int idEstadia = 0;
                         
                         Object[] opciones = {"SEGUIR CARGANDO","CARGAR OTRA HABITACION","SALIR"};
-                        int confirmacion = JOptionPane.showOptionDialog(this, null,null,JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones,null);
+                        int confirmacion = JOptionPane.showOptionDialog(this, "Elija una opcion","Seleccion",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE, null,opciones,null);
                         switch(confirmacion){
                             case JOptionPane.OK_OPTION: //Se vuelve a mostrar la interfaz de busqueda de pasajeros para seguir agregando
                                                         break;

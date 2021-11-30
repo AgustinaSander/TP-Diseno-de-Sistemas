@@ -1,6 +1,9 @@
 
 package Gestores;
 import DAO.*;
+import Dominio.Localidad;
+import Dominio.Pais;
+import Dominio.Provincia;
 import java.sql.*;
 import java.util.*;
 
@@ -25,20 +28,27 @@ public class GestorGeografico {
     //Obtener listado de todos los paises de la base de datos
     public  List<String> obtenerPaises(){
         //PaisDAO obtiene los paises de la base de datos
-        List <String> listaPaises = null;
+        List <String> nombrePaises = new ArrayList<>();
+        List <Pais> listaPaises = new ArrayList<>();
         try {
             paisDAO = new PaisDAOImpl();
             listaPaises = paisDAO.obtenerPaises();   
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return listaPaises;
+        
+        for(Pais p : listaPaises){
+            nombrePaises.add(p.getNombrePais());
+        }
+        
+        return nombrePaises;
     }
     
     //Obtener el listado de provincias que componen un pais
     public List<String> obtenerProvincias(String pais){
         //PaisDAO obtiene las provincias de la base de datos
-        List <String> listaProvincias = null;
+        List <String> listaNombreProvincias = new ArrayList<>();
+        List <Provincia> listaProvincias = new ArrayList<>();
         try {
             paisDAO = new PaisDAOImpl();
             listaProvincias = paisDAO.obtenerProvincias(pais);
@@ -46,70 +56,81 @@ public class GestorGeografico {
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return listaProvincias;
+        
+        for(Provincia prov : listaProvincias){
+            listaNombreProvincias.add(prov.getNombreProvincia());
+        }
+        
+        
+        return listaNombreProvincias;
     }
     
     //Obtener listado de localidades que componen una provincia que pertenece a un pais
     public List<String> obtenerLocalidades(String provincia, String pais){
         //ProvinciaDAO obtiene las localidades de la base de datos
-        List <String> listaLocalidades = null;
+        List <String> listaNombreLocalidades = new ArrayList<>();
+        List <Localidad> listaLocalidades = new ArrayList<>();
         try {
             provinciaDAO = new ProvinciaDAOImpl();
+           
             listaLocalidades = provinciaDAO.obtenerLocalidades(provincia, pais);
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return listaLocalidades;
+        
+        for(Localidad l : listaLocalidades){
+            listaNombreLocalidades.add(l.getNombreLocalidad());
+        }
+        
+        return listaNombreLocalidades;
     }
     
-    //Obtener IdPais a partir del nombre
-    public int obtenerIdPais(String pais){
+    //Obtener Pais a partir del nombre
+    public Pais obtenerPais(String pais){
         //PaisDAO se encarga
-        int idPais = 0;
-        
+        Pais p = null;
         try {
             paisDAO = new PaisDAOImpl();
-            idPais = paisDAO.obtenerIdPais(pais);
+            p = paisDAO.obtenerPais(pais);
 
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return idPais;
+        return p;
     }
     
-    //Obtener IdProvincia a partir del nombre
-    public int obtenerIdProvincia(String provincia, int idPais){
+    //Obtener provincia a partir del nombre
+    public Provincia obtenerProvincia(String provincia, int idPais){
         //ProvinciaDAO se encarga
-        int idProvincia = 0;
+        Provincia prov = null;
         
         try {
             provinciaDAO = new ProvinciaDAOImpl();
-            idProvincia = provinciaDAO.obtenerIdProvincia(provincia, idPais);
+            prov = provinciaDAO.obtenerProvincia(provincia, idPais);
             
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return idProvincia;
+        return prov;
     }
     
-    //Obtener IdLocalidad a partir del nombre
-    public int obtenerIdLocalidad(String localidad, String provincia, String pais){
+    //Obtener localidad a partir del nombre
+    public Localidad obtenerLocalidad(String localidad, String provincia, String pais){
         //LocalidadDAO se encarga
-        int idLocalidad = 0;
+        Localidad l = null;
         
         try {
             //Obtengo el id del pais y de la provincia a la que pertenece la localidad
-            int idPais = obtenerIdPais(pais);
-            int idProvincia = obtenerIdProvincia(provincia, idPais);
+            int idPais = obtenerPais(pais).getIdPais();
+            int idProvincia = obtenerProvincia(provincia, idPais).getIdProvincia();
             
-            //Obtengo el id de la localidad con su nombre y el id de la provincia a la que pertenece
-            localidadDAO = new LocalidadDAOImpl();
-            idLocalidad = localidadDAO.obtenerIdLocalidad(localidad, idProvincia);
+            //Obtengo la localidad
+            l = new LocalidadDAOImpl().obtenerLocalidad(localidad, idProvincia);
             
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return idLocalidad;
+        return l;
     }
     
 }

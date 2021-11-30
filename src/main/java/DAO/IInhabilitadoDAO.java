@@ -9,5 +9,5 @@ import java.util.List;
 
 
 public interface IInhabilitadoDAO {
-    public List<Inhabilitado> obtenerListaInhabilitados(List<Habitacion> habitaciones, Date fechaDesde, Date fechaHasta) throws SQLException;
+    public List<Inhabilitado> obtenerListaInhabilitados(Habitacion habitacion, Date fechaDesde, Date fechaHasta) throws SQLException;
 }

@@ -1,19 +1,17 @@
 
 package Dominio;
 
-public class ItemFactura {
-    private int idItemFactura;
-    private Boolean facturado;
-    private String descripcion;
-    private float precioItem;
-    private Factura factura;
+public abstract class ItemFactura {
+    protected int idItemFactura;
+    protected String descripcion;
+    protected float precioItem;
+    protected Factura factura;
 
     public ItemFactura() {
     }
 
-    public ItemFactura(int idItemFactura, Boolean facturado, String descripcion, float precioItem, Factura factura) {
+    public ItemFactura(int idItemFactura, String descripcion, float precioItem, Factura factura) {
         this.idItemFactura = idItemFactura;
-        this.facturado = facturado;
         this.descripcion = descripcion;
         this.precioItem = precioItem;
         this.factura = factura;
@@ -25,14 +23,6 @@ public class ItemFactura {
 
     public void setIdItemFactura(int idItemFactura) {
         this.idItemFactura = idItemFactura;
-    }
-
-    public Boolean getFacturado() {
-        return facturado;
-    }
-
-    public void setFacturado(Boolean facturado) {
-        this.facturado = facturado;
     }
 
     public String getDescripcion() {
@@ -61,7 +51,7 @@ public class ItemFactura {
 
     @Override
     public String toString() {
-        return "ItemFactura{" + "idItemFactura=" + idItemFactura + ", facturado=" + facturado + ", descripcion=" + descripcion + ", precioItem=" + precioItem + ", factura=" + factura + '}';
+        return "ItemFactura{" + "idItemFactura=" + idItemFactura + ", descripcion=" + descripcion + ", precioItem=" + precioItem + ", factura=" + factura + '}';
     }
     
     

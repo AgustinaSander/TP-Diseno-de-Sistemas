@@ -98,7 +98,7 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             res = stmt.executeUpdate();
             
             conn.commit();
-        } catch (SQLException ex) {
+         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
             try {
                 conn.rollback();
@@ -106,34 +106,9 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             } catch (SQLException ex1) {
                 ex1.printStackTrace(System.out);
             }
-        } finally{
-            close(stmt);
-            close(conn);
-        }
-        
-        return res;
-    }
-
-    @Override
-    //Verifico si existen pasajeros con mismo tipoDoc y numDoc
-    public Boolean verificarExistenciaPasajero(String tipoDoc, String numDoc) throws SQLException{
-        Boolean existe = false;
-        
-        try {
-            conn = getConnection();
-            stmt = conn.prepareStatement("SELECT * FROM pasajero WHERE tipoDoc = ? AND numDoc = ?");
-            stmt.setString(1,tipoDoc);
-            stmt.setString(2,numDoc);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                existe = true;
-            }
-            
-        } catch (SQLException ex) {
-            ex.printStackTrace(System.out);
-        } finally{
+        }    
+        finally{
             try {
-                close(rs);
                 close(stmt);
                 close(conn);
             } catch (SQLException ex) {
@@ -141,18 +116,67 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             }
         }
         
-        return existe;
+        return res;
+    }
+
+    @Override
+    //Verifico si existen pasajeros con mismo tipoDoc y numDoc
+    public List<Pasajero> verificarExistenciaPasajero(String tipoDoc, String numDoc) throws SQLException{
+        List<Pasajero> listaPasajeros = new ArrayList<>();
+        
+        try {
+            conn = getConnection();
+            this.conexionTransaccional = conn;
+            
+            if(conn.getAutoCommit()){
+                conn.setAutoCommit(false);
+            }
+            
+            stmt = conn.prepareStatement("SELECT * FROM pasajero WHERE tipoDoc = ? AND numDoc = ?");
+            stmt.setString(1,tipoDoc);
+            stmt.setString(2,numDoc);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                Pasajero pas = obtenerPasajero(rs.getInt("idPersona"));
+                listaPasajeros.add(pas);
+            }
+            
+            conn.commit();
+         } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+            try {
+                conn.rollback();
+                System.out.println("Se hace rollback");
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        }    
+        finally{
+            try {
+                close(stmt);
+                close(conn);
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
+        return listaPasajeros;
     }
     
     @Override
     //Obtengo todos los pasajeros que coinciden con los datos del objeto GestionarPasajeroDTO
-    public List<GestionarPasajeroDTO> obtenerPasajeros(GestionarPasajeroDTO busquedaDTO) throws SQLException{
-        List <GestionarPasajeroDTO> resPasajeros = new ArrayList<>();
-        
+    public List<Pasajero> obtenerPasajeros(GestionarPasajeroDTO busquedaDTO) throws SQLException{
+        List <Pasajero> resPasajeros = new ArrayList<>();
+        List <Integer> idPasajeros = new ArrayList<>();
         try {
             conn = getConnection();
+            this.conexionTransaccional = conn;
            
-            stmt = conn.prepareStatement("SELECT pasajero.idPersona,idDireccion,apellido,nombre,tipoDoc,numDoc,fechaNac FROM pasajero, persona WHERE ((? is null) or (? = apellido)) AND ((? is null) or (? = nombre)) AND ((? is null) or (? = tipoDoc)) AND ((? is null) or (? = numDoc)) AND pasajero.idPersona = persona.idPersona;");
+            if(conn.getAutoCommit()){
+                conn.setAutoCommit(false);
+            }
+            
+            stmt = conn.prepareStatement("SELECT idPersona FROM pasajero WHERE ((? is null) or (? = apellido)) AND ((? is null) or (? = nombre)) AND ((? is null) or (? = tipoDoc)) AND ((? is null) or (? = numDoc));");
             stmt.setString(1,busquedaDTO.getApellido());
             stmt.setString(2,busquedaDTO.getApellido());
             stmt.setString(3,busquedaDTO.getNombre());
@@ -164,21 +188,33 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             rs = stmt.executeQuery();
             GestionarPasajeroDTO pas = null;
             while(rs.next()){                
-                //Creo el objeto GestionarPasajeroDTO
-                //int id, String nombre, String apellido, TipoDocumento tipoDoc, String numDoc
-                pas = new GestionarPasajeroDTO(rs.getInt("idPersona"), rs.getInt("idDireccion"), rs.getString("nombre"),rs.getString("apellido"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"),rs.getDate("fechaNac"));
-                resPasajeros.add(pas);
-                
+                //Guardo los idPersona de los pasajeros obtenidos
+                idPasajeros.add(rs.getInt("idPersona"));   
             }
-        }finally{
+            
+            for(int id : idPasajeros){
+                resPasajeros.add(obtenerPasajero(id));
+            }
+            
+            conn.commit();   
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
             try {
-                close(rs);
+                conn.rollback();
+                System.out.println("Se hace rollback");
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        }    
+        finally{
+            try {
                 close(stmt);
                 close(conn);
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);
             }
         }
+        
         return resPasajeros;
     }
 
@@ -220,8 +256,6 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             stmt.setInt(5, pasajero.getIdPersona());
             stmt.executeUpdate();
             
-            
-            
             conn.commit();   
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -244,46 +278,82 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
     
     //Obtengo el objeto pasajero a partir del id de la persona
     @Override
-    public Pasajero obtenerPasajero(int idPasajero){
+    public Pasajero obtenerPasajero(int idPasajero) throws SQLException{
         Pasajero pas = null;
         try {
-            conn = getConnection();
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+            
             stmt = conn.prepareStatement("SELECT pas.*, per.*, dir.*, l.id AS idLocalidad, l.*, e.id AS idProvincia, e.*, p.*, nac.id AS idNacionalidad, nac.paisnombre AS paisNacionalidad, nac.nacionalidad AS nacionalidadNacionalidad FROM pasajero AS pas, persona AS per, direccion AS dir, localidad as l, estado as e, pais AS p, pais AS nac WHERE pas.idPersona = ? AND pas.idPersona = per.idPersona AND pas.idPais = nac.id AND per.idDireccion = dir.idDireccion AND dir.idLocalidad = l.id AND l.id_provincia = e.id AND e.ubicacionpaisid = p.id");
             stmt.setInt(1,idPasajero);
             rs = stmt.executeQuery();
             while(rs.next()){                
                 //Creo el objeto pasajero
-                //Obtengo el objeto pais
-                Pais pais = new Pais(rs.getInt("idPais"),rs.getString("paisnombre"),rs.getString("nacionalidad"));
-            
-                //Obtengo el objeto provincia
-                Provincia provincia = new Provincia(rs.getInt("id_provincia"), pais, rs.getString("estadonombre"));
-
                 //Obtengo el objeto localidad
-                Localidad localidad = new Localidad(rs.getInt("idLocalidad"),provincia, rs.getString("localidad"));
-
+                Localidad localidad = new LocalidadDAOImpl(conn).obtenerLocalidad(rs.getInt("idLocalidad"));
+                
                 //Obtengo el objeto pais para la nacionalidad
-                Pais nacionalidad = new Pais(rs.getInt("idNacionalidad"), rs.getString("paisNacionalidad"),rs.getString("nacionalidadNacionalidad"));        
-
+                Pais nacionalidad = new PaisDAOImpl(conn).obtenerPais(rs.getInt("idNacionalidad"));        
+                
                 //Obtengo el objeto direccion
-                Direccion direccion = new Direccion(rs.getInt("idDireccion"),localidad,rs.getString("calle"),rs.getInt("numero"),rs.getString("departamento"),rs.getInt("codigoPostal"));
-
+                Direccion direccion = new DireccionDAOImpl(conn).obtenerDireccionPasajero(idPasajero);
 
                 pas = new Pasajero(rs.getString("apellido"),rs.getString("nombre"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"),new java.util.Date(rs.getDate("fechaNac").getTime()),rs.getString("email"),rs.getString("ocupacion"),nacionalidad,rs.getInt("idPersona"),rs.getString("CUIT"),PosicionIVA.valueOf(rs.getString("posIVA")), rs.getString("telefono"),direccion);
            
             }
-        } catch (SQLException ex) {
-             ex.printStackTrace(System.out);
-        }
-        finally{
+        }finally{
             try {
-                close(stmt);
-                close(rs);
-                close(conn);
+                
+                if(this.conexionTransaccional == null){
+                    close(stmt);
+                    close(conn);
+                }
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);
             }
         }
         return pas;
+    }
+    
+    @Override
+    public List<OcupadaPor> obtenerOcupantesEstadia(int idEstadia) throws SQLException{
+        List<OcupadaPor> pasajeros = new ArrayList<>();
+       
+        try{
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+            
+            stmt = conn.prepareStatement("SELECT * FROM ocupadapor AS o, persona AS per, pasajero AS p WHERE o.idEstadia = ? AND per.idPersona = o.idPersona AND o.idPersona = p.idPersona");
+            stmt.setInt(1, idEstadia);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                
+                Pasajero pas = new Pasajero(rs.getString("apellido"),rs.getString("nombre"),TipoDocumento.valueOf(rs.getString("tipoDoc")),rs.getString("numDoc"),new java.util.Date(rs.getDate("fechaNac").getTime()),rs.getString("email"),rs.getString("ocupacion"),null,rs.getInt("idPersona"),rs.getString("CUIT"),PosicionIVA.valueOf(rs.getString("posIVA")), rs.getString("telefono"),null);
+                //Obtengo la direccion del pasajero con DireccionDAO
+                Direccion direccion = new DireccionDAOImpl(conn).obtenerDireccionPasajero(pas.getIdPersona());
+                //Le seteo la direccion al pasajero
+                pas.setDireccion(direccion);
+                
+                //Obtengo la nacionalidad del pasajero con PaisDAO
+                Pais nacionalidad = new PaisDAOImpl(conn).obtenerNacionalidad(pas.getIdPersona());
+                //Le seteo la nacionalidad
+                pas.setNacionalidad(nacionalidad);
+                        
+                //Creo el objeto OcupadaPor y lo agrego a la lista
+                OcupadaPor ocupadaPor = new OcupadaPor(pas, rs.getBoolean("esResponsable"));
+                pasajeros.add(ocupadaPor);
+            }
+
+        }finally{
+            try {
+                close(stmt);
+                close(rs);
+                if(this.conexionTransaccional == null){
+                    close(conn);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
+        return pasajeros;
     }
 }

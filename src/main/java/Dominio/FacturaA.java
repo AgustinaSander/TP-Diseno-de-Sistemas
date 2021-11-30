@@ -19,8 +19,13 @@ public class FacturaA extends Factura{
         this.montoIVA = montoIVA;
     }
 
-    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, List<ItemFactura> listaItemsFactura, Estadia estadia) {
-        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, listaItemsFactura, estadia);
+    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona) {
+        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona);
+        this.montoIVA = montoIVA;
+    }
+
+    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito) {
+        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, notaCredito);
         this.montoIVA = montoIVA;
     }
 
@@ -34,7 +39,7 @@ public class FacturaA extends Factura{
 
     @Override
     public String toString() {
-        return "FacturaA{" + "montoIVA=" + montoIVA + '}';
+        return "FacturaA{" + "montoIVA=" + montoIVA + "} Factura { "+ super.toString() +"}";
     }
     
     

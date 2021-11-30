@@ -10,25 +10,14 @@ public abstract class Servicio {
     protected Date fecha;
     protected float precioTotal;
     protected int cantidad;
-    protected Estadia estadia;
-    protected List<ItemServicio> listaItemsServicios;
 
+    //Por mas de que no pueda usar los constructores para instanciar la clase abstracta, los necesito para que sus clases hijas los utilicen
     public Servicio(int idServicio, String descripcion, Date fecha, float precioTotal, int cantidad) {
         this.idServicio = idServicio;
         this.descripcion = descripcion;
         this.fecha = fecha;
         this.precioTotal = precioTotal;
         this.cantidad = cantidad;
-    }
-    
-    public Servicio(int idServicio, String descripcion, Date fecha, float precioTotal, int cantidad, Estadia estadia, List<ItemServicio> listaItemsServicios) {
-        this.idServicio = idServicio;
-        this.descripcion = descripcion;
-        this.fecha = fecha;
-        this.precioTotal = precioTotal;
-        this.cantidad = cantidad;
-        this.estadia = estadia;
-        this.listaItemsServicios = listaItemsServicios;
     }
 
     public Servicio() {
@@ -74,26 +63,11 @@ public abstract class Servicio {
         this.cantidad = cantidad;
     }
 
-    public Estadia getEstadia() {
-        return estadia;
-    }
-
-    public void setEstadia(Estadia estadia) {
-        this.estadia = estadia;
-    }
-
-    public List<ItemServicio> getListaItemsServicios() {
-        return listaItemsServicios;
-    }
-
-    public void setListaItemsServicios(List<ItemServicio> listaItemsServicios) {
-        this.listaItemsServicios = listaItemsServicios;
-    }
+    
 
     @Override
     public String toString() {
-        return "Servicio{" + "idServicio=" + idServicio + ", descripcion=" + descripcion + ", fecha=" + fecha + ", precioTotal=" + precioTotal + ", cantidad=" + cantidad + ", estadia=" + estadia + ", listaItemsServicios=" + listaItemsServicios + '}';
+        return "Servicio{" + "idServicio=" + idServicio + ", descripcion=" + descripcion + ", fecha=" + fecha + ", precioTotal=" + precioTotal + ", cantidad=" + cantidad + '}';
     }
-    
     
 }

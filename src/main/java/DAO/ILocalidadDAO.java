@@ -6,6 +6,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ILocalidadDAO {
-    public List<String> obtenerLocalidad(int idLocalidad) throws SQLException;
-    public int obtenerIdLocalidad(String localidad, int idProvincia) throws SQLException;
+    public Localidad obtenerLocalidad(int idLocalidad) throws SQLException;
+    public Localidad obtenerLocalidad(String localidad, int idProvincia) throws SQLException;
 }

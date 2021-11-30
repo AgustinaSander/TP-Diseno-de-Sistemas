@@ -10,18 +10,16 @@ public class FechaReserva {
     private Date fechaEgreso;
     private LocalTime horaEgreso;
     private Habitacion habitacion;
-    private Reserva reserva;
     
     public FechaReserva() {
     }
 
-    public FechaReserva(Date fechaIngreso, LocalTime horaIngreso, Date fechaEgreso, LocalTime horaEgreso, Habitacion habitacion, Reserva reserva) {
+    public FechaReserva(Date fechaIngreso, LocalTime horaIngreso, Date fechaEgreso, LocalTime horaEgreso, Habitacion habitacion) {
         this.fechaIngreso = fechaIngreso;
         this.horaIngreso = horaIngreso;
         this.fechaEgreso = fechaEgreso;
         this.horaEgreso = horaEgreso;
         this.habitacion = habitacion;
-        this.reserva = reserva;
     }
 
     public Date getFechaIngreso() {
@@ -64,20 +62,11 @@ public class FechaReserva {
         this.habitacion = habitacion;
     }
 
-    public Reserva getReserva() {
-        return reserva;
-    }
-
-    public void setReserva(Reserva reserva) {
-        this.reserva = reserva;
-    }
-
     @Override
     public String toString() {
-        return "FechaReserva{" + "fechaIngreso=" + fechaIngreso + ", horaIngreso=" + horaIngreso + ", fechaEgreso=" + fechaEgreso + ", horaEgreso=" + horaEgreso + ", habitacion=" + habitacion + ", reserva=" + reserva + '}';
+        return "FechaReserva{" + "fechaIngreso=" + fechaIngreso + ", horaIngreso=" + horaIngreso + ", fechaEgreso=" + fechaEgreso + ", horaEgreso=" + horaEgreso + ", habitacion=" + habitacion + '}';
     }
 
-    
-    
+
     
 }

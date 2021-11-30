@@ -6,6 +6,7 @@ import DAO.ReservaDAOImpl;
 import Dominio.DTO.HabitacionDTO;
 import Dominio.DTO.ReservaDTO;
 import Dominio.FechaReserva;
+import Dominio.Reserva;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,14 +26,19 @@ public class GestorReservas {
     
     public List<ReservaDTO> buscarReservas(HabitacionDTO hab, List<Date> fechasReservadas) {
         reservaDAO = new ReservaDAOImpl();
-        List<FechaReserva> reservas = reservaDAO.buscarReservas(hab.getId(), fechasReservadas);
+        List<Reserva> reservas = reservaDAO.buscarReservas(hab.getId(), fechasReservadas);
         List<ReservaDTO> listaReservas = new ArrayList<>();
+        List<FechaReserva> listaFechasReservas = new ArrayList<>();
         
-        //Convierto a reservaDTO y retorno la lista a la interfaz
-        
-        for (FechaReserva fr: reservas){
-            listaReservas.add(new ReservaDTO(fr.getReserva().getIdReserva(), fr.getFechaIngreso(), fr.getFechaEgreso(), fr.getReserva().getNombre(), fr.getReserva().getApellido(), fr.getReserva().getTelefono()));
+        for(Reserva res : reservas){
+            for(FechaReserva fecha : res.getListaFechaReserva()){
+                if(fecha.getHabitacion().getIdHabitacion() == hab.getId()){
+                    listaFechasReservas.add(fecha);
+                    listaReservas.add(new ReservaDTO(res.getIdReserva(), fecha.getFechaIngreso(), fecha.getFechaEgreso(), res.getNombre(),res.getApellido(), res.getTelefono()));
+                }
+            }
         }
+        
         return listaReservas;
     }
 }

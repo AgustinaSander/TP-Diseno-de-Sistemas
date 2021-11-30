@@ -16,11 +16,6 @@ public class Bar extends Servicio{
         this.itemBar = itemBar;
     }
 
-    public Bar(ItemBar itemBar, int idServicio, String descripcion, Date fecha, float precioTotal, int cantidad, Estadia estadia, List<ItemServicio> listaItemsServicios) {
-        super(idServicio, descripcion, fecha, precioTotal, cantidad, estadia, listaItemsServicios);
-        this.itemBar = itemBar;
-    }
-
     public ItemBar getItemBar() {
         return itemBar;
     }
@@ -31,7 +26,7 @@ public class Bar extends Servicio{
 
     @Override
     public String toString() {
-        return "Bar{" + "itemBar=" + itemBar + '}';
+        return "Bar{" + "itemBar=" + itemBar + "} Servicio{ "+ super.toString() +'}';
     }
     
     

@@ -3,7 +3,7 @@ package Dominio;
 
 import java.util.Date;
 
-public class ItemEstadia extends ItemServicio{
+public class ItemEstadia extends ItemFactura{
     private Date desde;
     private Date hasta;
     private Estadia estadia;
@@ -12,6 +12,13 @@ public class ItemEstadia extends ItemServicio{
     }
 
     public ItemEstadia(Date desde, Date hasta, Estadia estadia) {
+        this.desde = desde;
+        this.hasta = hasta;
+        this.estadia = estadia;
+    }
+
+    public ItemEstadia(Date desde, Date hasta, Estadia estadia, int idItemFactura, String descripcion, float precioItem, Factura factura) {
+        super(idItemFactura, descripcion, precioItem, factura);
         this.desde = desde;
         this.hasta = hasta;
         this.estadia = estadia;

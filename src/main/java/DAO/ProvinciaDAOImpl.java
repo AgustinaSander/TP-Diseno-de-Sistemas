@@ -3,6 +3,9 @@ package DAO;
 
 import static Conexion.Conexion.close;
 import static Conexion.Conexion.getConnection;
+import Dominio.Localidad;
+import Dominio.Pais;
+import Dominio.Provincia;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,23 +28,23 @@ public class ProvinciaDAOImpl implements IProvinciaDAO{
     }
     
     @Override
-    public int obtenerIdProvincia(String nombre, int idPais) throws SQLException{
-        int idProvincia = 0;
+    public Provincia obtenerProvincia(int idProvincia) throws SQLException{
+        Provincia prov = null;
         try {
             //Si necesito aplicar transacciones
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
-            stmt = conn.prepareStatement("SELECT id FROM estado WHERE estadonombre = ? AND ubicacionpaisid = ?");
-            stmt.setString(1,nombre);
-            stmt.setInt(2,idPais);
+            stmt = conn.prepareStatement("SELECT * FROM estado WHERE id = ?");
+            stmt.setInt(1,idProvincia);
 
             rs = stmt.executeQuery();
-            
+           
             while(rs.next()){
-                idProvincia = rs.getInt("id");
+                Pais p = new PaisDAOImpl().obtenerPais(rs.getInt("ubicacionpaisid"));
+                prov = new Provincia(rs.getInt("id"), p, rs.getString("estadonombre"));
             }
-        } 
-        finally{
+        
+        } finally{
             try {
                 close(stmt);
                 if(this.conexionTransaccional == null){
@@ -52,13 +55,49 @@ public class ProvinciaDAOImpl implements IProvinciaDAO{
             }
         }
         
-        return idProvincia;
+        return prov;
+    }
+    
+    @Override
+    public Provincia obtenerProvincia(String nombre, int idPais) throws SQLException{
+        
+        Provincia prov = null;
+        
+        try {
+            //Si necesito aplicar transacciones
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+            
+            stmt = conn.prepareStatement("SELECT * FROM estado WHERE estadonombre = ? AND ubicacionpaisid = ?");
+            stmt.setString(1,nombre);
+            stmt.setInt(2,idPais);
+
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                Pais p = new PaisDAOImpl().obtenerPais(idPais);
+                
+                prov = new Provincia(rs.getInt("id"), p, rs.getString("estadonombre"));
+            }
+       
+        } finally{
+            try {
+                close(stmt);
+                if(this.conexionTransaccional == null){
+                    close(conn);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+       
+        return prov;
     }
     
     @Override
     //Obtener listado de las localidades que pertenecen a una provincia
-    public List<String> obtenerLocalidades(String provincia, String pais) throws SQLException{
-        List <String> listaLocalidades = new ArrayList();
+    public List<Localidad> obtenerLocalidades(String provincia, String pais) throws SQLException{
+        List <Localidad> listaLocalidades = new ArrayList();
+        
         try {
             this.conexionTransaccional = getConnection();
             conn = conexionTransaccional;
@@ -68,16 +107,17 @@ public class ProvinciaDAOImpl implements IProvinciaDAO{
             }
             
             //Obtengo el idPais
-            int idPais = new PaisDAOImpl(conn).obtenerIdPais(pais);
+            int idPais = new PaisDAOImpl(conn).obtenerPais(pais).getIdPais();
             
             //Obtengo el idProvincia
-            int idProvincia = obtenerIdProvincia(provincia,idPais);
+            Provincia prov = obtenerProvincia(provincia,idPais);
+           
             //Obtengo la lista de localidades de esa provincia
-            stmt = conn.prepareStatement("SELECT localidad FROM localidad WHERE id_provincia = ?");
-            stmt.setInt(1,idProvincia);
+            stmt = conn.prepareStatement("SELECT * FROM localidad WHERE id_provincia = ?");
+            stmt.setInt(1, prov.getIdProvincia());
             rs = stmt.executeQuery();
             while(rs.next()){
-                listaLocalidades.add(rs.getString("localidad"));
+                listaLocalidades.add(new Localidad(rs.getInt("id_provincia"), prov, rs.getString("localidad")));
             }
             
             conn.commit();

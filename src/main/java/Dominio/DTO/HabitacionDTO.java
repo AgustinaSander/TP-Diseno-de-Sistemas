@@ -3,11 +3,11 @@ package Dominio.DTO;
 
 public class HabitacionDTO {
     private int id;
-    private String nombre;
+    private String numero;
 
-    public HabitacionDTO(int id, String nombre) {
+    public HabitacionDTO(int id, String numero) {
         this.id = id;
-        this.nombre = nombre;
+        this.numero = numero;
     }
 
     public int getId() {
@@ -18,17 +18,17 @@ public class HabitacionDTO {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getNumero() {
+        return numero;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setnumero(String numero) {
+        this.numero = numero;
     }
 
     @Override
     public String toString() {
-        return "HabitacionDTO{" + "id=" + id + ", nombre=" + nombre + '}';
+        return "HabitacionDTO{" + "id=" + id + ", numero=" + numero + '}';
     }
     
     

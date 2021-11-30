@@ -22,15 +22,26 @@ public class TipoHabitacionDAOImpl implements ITipoHabitacionDAO{
     private ResultSet rs = null;
     
     @Override
-    public List<String> obtenerTiposDeHabitaciones() throws SQLException{
-        List<String> tiposHabitaciones = new ArrayList <>();
+    public List<TipoDeHabitacion> obtenerTiposDeHabitaciones() throws SQLException{
+        List<TipoDeHabitacion> tiposHabitaciones = new ArrayList <>();
         try {
             conn = getConnection();
-            stmt = conn.prepareStatement("SELECT nombre FROM tipodehabitacion");
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                tiposHabitaciones.add(rs.getString("nombre"));
+            
+            if(conn.getAutoCommit()){
+                conn.setAutoCommit(false);
             }
+            
+            stmt = conn.prepareStatement("SELECT * FROM tipodehabitacion");
+            rs = stmt.executeQuery();
+            while(rs.next()){ 
+                TipoDeHabitacion tipoHab = new TipoDeHabitacion(rs.getInt("id"), rs.getString("nombre"), rs.getFloat("precio"));
+                //Llamo al HabitacionDAO para obtener la lista de habitaciones de ese tipo
+                List<Habitacion> listaHabitaciones = new HabitacionDAOImpl(conn).obtenerHabitacionesDeUnTipo(rs.getInt("id"));
+                tipoHab.setListaHabitaciones(listaHabitaciones);
+                tiposHabitaciones.add(tipoHab);
+            }
+            
+            conn.commit();
         } finally{
             try {
                 close(stmt);
@@ -45,7 +56,7 @@ public class TipoHabitacionDAOImpl implements ITipoHabitacionDAO{
     }
 
     @Override
-    public List<Habitacion> obtenerHabitaciones(String tipoHabitacion) throws SQLException{
+    public TipoDeHabitacion obtenerHabitacionesDeUnTipo(String tipoHabitacion) throws SQLException{
         List<Habitacion> habitaciones = new ArrayList<>();
         TipoDeHabitacion tipoDeHabitacion = new TipoDeHabitacion();
         try {
@@ -55,6 +66,7 @@ public class TipoHabitacionDAOImpl implements ITipoHabitacionDAO{
             if(conn.getAutoCommit()){
                 conn.setAutoCommit(false);
             }
+            
             //Obtengo el id del tipo de habitacion
             stmt = conn.prepareStatement("SELECT * FROM tipodehabitacion WHERE nombre = ?");
             stmt.setString(1,tipoHabitacion);
@@ -65,17 +77,10 @@ public class TipoHabitacionDAOImpl implements ITipoHabitacionDAO{
                 tipoDeHabitacion.setPrecio(rs.getFloat("precio"));
             }
             
-            //Buscamos las habitaciones de ese tipo de habitacion
-            stmt = conn.prepareStatement("SELECT * FROM habitacion WHERE idTipoHabitacion = ? ");
-            stmt.setInt(1,tipoDeHabitacion.getIdTipoHabitacion());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                //Por cada habitacion de ese tipo
-                Habitacion h = new Habitacion(rs.getInt("id"), rs.getString("nro"), rs.getFloat("precio"), tipoDeHabitacion);
-                
-                //Agrego la habitaciones a la lista de habitaciones para retornarla
-                habitaciones.add(h);
-            }
+            //Buscamos las habitaciones de ese tipo de habitacion con HabitacionDAO
+            habitaciones = new HabitacionDAOImpl(conn).obtenerHabitacionesDeUnTipo(tipoDeHabitacion.getIdTipoHabitacion());
+            tipoDeHabitacion.setListaHabitaciones(habitaciones);
+            
             conn.commit();
             
         } catch (SQLException ex) {
@@ -96,7 +101,7 @@ public class TipoHabitacionDAOImpl implements ITipoHabitacionDAO{
             }
         }
         
-        return habitaciones;
+        return tipoDeHabitacion;
     }
 
     

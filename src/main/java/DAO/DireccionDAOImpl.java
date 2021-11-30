@@ -4,6 +4,7 @@ package DAO;
 import static Conexion.Conexion.close;
 import static Conexion.Conexion.getConnection;
 import Dominio.Direccion;
+import Dominio.Localidad;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -55,13 +56,19 @@ public class DireccionDAOImpl implements IDireccionDAO{
             }
             
             conn.commit();
-        }finally{
+         } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
             try {
-                close(rs);
+                conn.rollback();
+                System.out.println("Se hace rollback");
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        }    
+        finally{
+            try {
                 close(stmt);
-                if(this.conexionTransaccional == null){
-                    close(conn);
-                }
+                close(conn);
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);
             }
@@ -100,4 +107,35 @@ public class DireccionDAOImpl implements IDireccionDAO{
         }
     }
     
+    public Direccion obtenerDireccionPasajero(int idPersona) throws SQLException{
+        Direccion direccion = null;
+        try {
+            //Si necesito aplicar transacciones
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+        
+            stmt = conn.prepareStatement("SELECT d.* FROM persona AS p, direccion AS d WHERE p.idPersona = ? AND p.idDireccion = d.idDireccion");
+            stmt.setInt(1,idPersona);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                //Obtenemos la localidad mediante LocalidadDAO
+                Localidad localidad = new LocalidadDAOImpl(conn).obtenerLocalidad(rs.getInt("idLocalidad"));
+                
+                //Creo el objeto direccion
+                direccion = new Direccion(rs.getInt("idDireccion"), localidad, rs.getString("calle"), rs.getInt("numero"), rs.getString("departamento"), rs.getInt("codigoPostal"));
+            }
+
+        }finally{
+            try {
+                close(stmt);
+                if(this.conexionTransaccional == null){
+                    close(conn);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
+        return direccion;
+    }
 }

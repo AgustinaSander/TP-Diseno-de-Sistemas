@@ -13,6 +13,7 @@ import DAO.TipoHabitacionDAOImpl;
 
 import Dominio.DTO.EstadoHabitacionDTO;
 import Dominio.DTO.HabitacionDTO;
+import Dominio.DTO.TipoDeHabitacionDTO;
 
 import Dominio.Estadia;
 import Dominio.FechaReserva;
@@ -65,17 +66,21 @@ public class GestorHabitaciones {
         return fechasValidas;
     }
     
-    public List <String> obtenerTiposDeHabitaciones(){
+    public List <TipoDeHabitacionDTO> obtenerTiposDeHabitaciones(){
         
         tipoHabitacionDAO = new TipoHabitacionDAOImpl();
-        
-        List<String> tiposHabitaciones = null;
+        List<TipoDeHabitacionDTO> tiposHabitaciones = new ArrayList<>();
+        List<TipoDeHabitacion> tipos = new ArrayList<>();
         try {
-            tiposHabitaciones = tipoHabitacionDAO.obtenerTiposDeHabitaciones();
+            tipos = tipoHabitacionDAO.obtenerTiposDeHabitaciones();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
- 
+        
+        for(TipoDeHabitacion tipo : tipos){
+            tiposHabitaciones.add(new TipoDeHabitacionDTO(tipo.getIdTipoHabitacion(), tipo.getNombre()));
+        }
+        
         return tiposHabitaciones;
     }
     
@@ -96,20 +101,24 @@ public class GestorHabitaciones {
 
         try {
             //Obtengo las habitaciones de ese tipo 
-            habitaciones = tipoHabitacionDAO.obtenerHabitaciones(tipoHabitacion);
+            TipoDeHabitacion tipoHab = tipoHabitacionDAO.obtenerHabitacionesDeUnTipo(tipoHabitacion);
+            habitaciones = tipoHab.getListaHabitaciones();
             
-            //Obtengo la lista de estadias de todas las habitaciones de ese tipo
-            IEstadiaDAO estadiaDAO = new EstadiaDAOImpl();
-            listaEstadias = estadiaDAO.obtenerListaEstadias(habitaciones, fechaDesde, fechaHasta);
+            //Recorro cada habitacion y encuentro sus estadias, reservas e inhabilitados
+            for(Habitacion h : habitaciones){
+                //Obtengo la lista de estadias de la habitacion
+                IEstadiaDAO estadiaDAO = new EstadiaDAOImpl();
+                listaEstadias.addAll(estadiaDAO.obtenerListaEstadias(h, fechaDesde, fechaHasta));
             
-            //Obtengo la lista de reservas de todas las habitaciones de ese tipo
-            IReservaDAO reservaDAO = new ReservaDAOImpl();
-            listaReservas = reservaDAO.obtenerListaReservas(habitaciones, fechaDesde, fechaHasta);
-            
-            //Obtengo la lista de inhabilitados de todas las habitaciones de ese tipo
-            IInhabilitadoDAO inhabilitadoDAO = new InhabilitadoDAOImpl();
-            listaInhabilitados = inhabilitadoDAO.obtenerListaInhabilitados(habitaciones, fechaDesde, fechaHasta);
+                //Obtengo la lista de reservas de la habitacion
+                IReservaDAO reservaDAO = new ReservaDAOImpl();
+                listaReservas.addAll(reservaDAO.obtenerListaReservas(h, fechaDesde, fechaHasta));
 
+                //Obtengo la lista de inhabilitados de la habitacion
+                IInhabilitadoDAO inhabilitadoDAO = new InhabilitadoDAOImpl();
+                listaInhabilitados.addAll(inhabilitadoDAO.obtenerListaInhabilitados(h, fechaDesde, fechaHasta));
+            }
+            
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
@@ -156,10 +165,9 @@ public class GestorHabitaciones {
 
             //Si hay reservas que sean de esa habitacion
             for(Reserva reserva : listaReservas){
-                
                 List<FechaReserva> listaFechaReserva = reserva.getListaFechaReserva();
+                
                 for(FechaReserva fr : listaFechaReserva){
-                    
                     if(fr.getHabitacion().getIdHabitacion() == hab.getIdHabitacion()){
                         //Hay reserva para la habitacion
                         //Obtengo la lista de estados de esa habitacion. Aca voy a ir agregando las reservas
@@ -172,7 +180,7 @@ public class GestorHabitaciones {
                             if(auxFechas.indexOf(fecha) != -1){
                                 estados.add(new EstadoHabitacionDTO(reserva.getIdReserva(), fecha, "Reservada"));
                                 auxFechas.remove(auxFechas.indexOf(fecha));
-                            }  
+                            }
                         }
                         
                     }
@@ -280,16 +288,32 @@ public class GestorHabitaciones {
     Boolean validarNroHabitacion(String nroHabitacion) {
         //Me fijo si existe una habitacion con ese nro
         habitacionDAO = new HabitacionDAOImpl();
-        return habitacionDAO.buscarNroHabitacion(nroHabitacion);
+        Habitacion hab = null;
+        try {
+            hab = habitacionDAO.obtenerHabitacion(nroHabitacion);
+            
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        
+        if(hab == null){
+                return false;
+            }
+        else{
+            return true;
+        }
     }
 
     public List<HabitacionDTO> obtenerHabitaciones(String tipoHab) {
         List<HabitacionDTO> habitaciones = new ArrayList<>();
         try {
-            List<Habitacion> hab = new TipoHabitacionDAOImpl().obtenerHabitaciones(tipoHab);
-            for(Habitacion h : hab){
+            //Obtengo las habitaciones de ese tipo 
+            TipoDeHabitacion tipoHabitacion = tipoHabitacionDAO.obtenerHabitacionesDeUnTipo(tipoHab);
+            
+            for(Habitacion h : tipoHabitacion.getListaHabitaciones()){
                 habitaciones.add(new HabitacionDTO(h.getIdHabitacion(), h.getNumeroHabitacion()));
             }
+
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }

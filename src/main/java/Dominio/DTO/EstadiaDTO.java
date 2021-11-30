@@ -13,6 +13,7 @@ public class EstadiaDTO {
     private Date fechaHasta;
     private Float precio;
     private List<PasajeroDTO> listaPasajeros;
+    private List<ServicioDTO> listaServicios;
     
     public EstadiaDTO() {
     }
