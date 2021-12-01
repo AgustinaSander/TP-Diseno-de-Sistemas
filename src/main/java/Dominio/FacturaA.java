@@ -19,13 +19,13 @@ public class FacturaA extends Factura{
         this.montoIVA = montoIVA;
     }
 
-    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona) {
-        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona);
+    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito) {
+        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, notaCredito);
         this.montoIVA = montoIVA;
     }
 
-    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito) {
-        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, notaCredito);
+    public FacturaA(float montoIVA, int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito, List<ItemFactura> listaItemsFactura, Estadia estadia) {
+        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, notaCredito, listaItemsFactura, estadia);
         this.montoIVA = montoIVA;
     }
 

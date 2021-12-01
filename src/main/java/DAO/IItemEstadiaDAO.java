@@ -2,6 +2,7 @@
 package DAO;
 
 
+import Dominio.Factura;
 import Dominio.ItemFactura;
 import java.sql.SQLException;
 import java.util.List;

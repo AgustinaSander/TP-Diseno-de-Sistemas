@@ -14,7 +14,6 @@ public class Estadia {
     private Habitacion habitacion;
     private List<OcupadaPor> listaOcupadaPor;
     private List<Servicio> listaServicios;
-    private List<Factura> listaFacturas;
     
     public Estadia() {
     }
@@ -38,7 +37,7 @@ public class Estadia {
         this.listaOcupadaPor = listaOcupadaPor;
     }
 
-    public Estadia(int idEstadia, Date fechaIngreso, LocalTime horaIngreso, Date fechaEgreso, LocalTime horaEgreso, Habitacion habitacion, List<OcupadaPor> listaOcupadaPor, List<Servicio> listaServicios, List<Factura> listaFacturas) {
+    public Estadia(int idEstadia, Date fechaIngreso, LocalTime horaIngreso, Date fechaEgreso, LocalTime horaEgreso, Habitacion habitacion, List<OcupadaPor> listaOcupadaPor, List<Servicio> listaServicios) {
         this.idEstadia = idEstadia;
         this.fechaIngreso = fechaIngreso;
         this.horaIngreso = horaIngreso;
@@ -47,7 +46,6 @@ public class Estadia {
         this.habitacion = habitacion;
         this.listaOcupadaPor = listaOcupadaPor;
         this.listaServicios = listaServicios;
-        this.listaFacturas = listaFacturas;
     }
 
     
@@ -116,17 +114,9 @@ public class Estadia {
         this.listaServicios = listaServicios;
     }
 
-    public List<Factura> getListaFacturas() {
-        return listaFacturas;
-    }
-
-    public void setListaFacturas(List<Factura> listaFacturas) {
-        this.listaFacturas = listaFacturas;
-    }
-
     @Override
     public String toString() {
-        return "Estadia{" + "idEstadia=" + idEstadia + ", fechaIngreso=" + fechaIngreso + ", horaIngreso=" + horaIngreso + ", fechaEgreso=" + fechaEgreso + ", horaEgreso=" + horaEgreso + ", habitacion=" + habitacion + ", listaOcupadaPor=" + listaOcupadaPor + ", listaServicios=" + listaServicios + ", listaFacturas=" + listaFacturas + '}';
+        return "Estadia{" + "idEstadia=" + idEstadia + ", fechaIngreso=" + fechaIngreso + ", horaIngreso=" + horaIngreso + ", fechaEgreso=" + fechaEgreso + ", horaEgreso=" + horaEgreso + ", habitacion=" + habitacion + ", listaOcupadaPor=" + listaOcupadaPor + ", listaServicios=" + listaServicios + '}';
     }
  
     

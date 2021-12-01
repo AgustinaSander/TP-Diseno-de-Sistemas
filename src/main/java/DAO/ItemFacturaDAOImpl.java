@@ -29,13 +29,13 @@ public class ItemFacturaDAOImpl implements IItemFacturaDAO{
     }
     
     @Override
-    public List<ItemFactura> obtenerItemsFactura(int idFactura) throws SQLException{
+    public List<ItemFactura> obtenerItemsFactura(Factura factura) throws SQLException{
         List<ItemFactura> itemsFactura = new ArrayList<>();
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
             stmt = conn.prepareStatement("SELECT * FROM itemfactura WHERE idFactura = ?");
-            stmt.setInt(1, idFactura);
+            stmt.setInt(1, factura.getIdFactura());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -44,9 +44,8 @@ public class ItemFacturaDAOImpl implements IItemFacturaDAO{
                 if(itemFactura == null){
                     itemFactura = new ItemServicioDAOImpl(conn).obtenerItemServicio(rs.getInt("idItemFactura"));
                 }
+                itemsFactura.add(itemFactura);
             }
-            
-            
         }finally{
             try {
                 close(stmt);

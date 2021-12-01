@@ -9,5 +9,5 @@ public interface IHabitacionDAO{
     public Habitacion obtenerHabitacion(int idHabitacion) throws SQLException;
     public Habitacion obtenerHabitacion(String nroHabitacion) throws SQLException;
     public List<Habitacion> obtenerHabitacionesDeUnTipo(int idTipo) throws SQLException;
-    
+    public List<Habitacion> obtenerHabitaciones() throws SQLException;
 }

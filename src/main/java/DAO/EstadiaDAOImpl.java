@@ -26,6 +26,15 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
     private Connection conn = null;
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
+
+    public EstadiaDAOImpl(Connection conexionTransaccional) {
+        this.conexionTransaccional = conexionTransaccional;
+    }
+
+    public EstadiaDAOImpl() {
+    }
+    
+    
     
     @Override
     public List<Estadia> obtenerListaEstadias(Habitacion hab, Date fechaDesde, Date fechaHasta) throws SQLException{
@@ -67,9 +76,6 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
                 //Busco los servicios de la estadia
                 List<Servicio> servicios = new ServicioDAOImpl(conn).obtenerServiciosEstadia(estadia.getIdEstadia());
                 estadia.setListaServicios(servicios);
-                //Busco las facturas de la estadia
-                List<Factura> facturas = new FacturaDAOImpl(conn).obtenerFacturasEstadia(estadia.getIdEstadia());
-                estadia.setListaFacturas(facturas);
                 //Agrego la estadia a la lista
                 listaEstadias.add(estadia);
             }
@@ -189,6 +195,8 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
         try {
             //Se obtiene la ultima estadia de esa habitacion
             conn = getConnection();
+            this.conexionTransaccional = conn;
+            
             //Conexion transaccional
             if(conn.getAutoCommit()){
                 conn.setAutoCommit(false);
@@ -218,10 +226,6 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
             //Obtengo la lista de servicios
             List<Servicio> listaServicios = new ServicioDAOImpl(conn).obtenerServiciosEstadia(estadia.getIdEstadia());
             estadia.setListaServicios(listaServicios);
-            
-            //Obtengo la lista de facturas
-            List<Factura> listaFacturas = new FacturaDAOImpl(conn).obtenerFacturasEstadia(estadia.getIdEstadia());
-            estadia.setListaFacturas(listaFacturas);
             
             conn.commit();
         } catch (SQLException ex) {
@@ -274,6 +278,42 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
         return listaOcupadaPor;
     }
 
-   
+    public Estadia obtenerEstadia(int idEstadia) throws SQLException{
+        Estadia estadia = null;
+        try {
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+            
+            stmt = conn.prepareStatement("SELECT * FROM estadia WHERE idEstadia = ?");
+            stmt.setInt(1, idEstadia);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                //Creo el objeto estadia
+                estadia = new Estadia(rs.getInt("id"), rs.getDate("fechaIngreso"), rs.getTime("horaIngreso").toLocalTime(), rs.getDate("fechaEgreso"), rs.getTime("horaEgreso").toLocalTime(),null);
+                //Busco la habitacion de la estadia
+                Habitacion habitacion = new HabitacionDAOImpl(conn).obtenerHabitacion(rs.getInt("idHabitacion"));
+                estadia.setHabitacion(habitacion);
+                //Busco los ocupantes de la estadia con PasajeroDAO
+                List<OcupadaPor> ocupantes = new PasajeroDAOImpl(conn).obtenerOcupantesEstadia(estadia.getIdEstadia());
+                estadia.setListaOcupadaPor(ocupantes);
+                //Busco los servicios de la estadia
+                List<Servicio> servicios = new ServicioDAOImpl(conn).obtenerServiciosEstadia(estadia.getIdEstadia());
+                estadia.setListaServicios(servicios);
+               
+            }
+        }finally{
+            try {
+                if(this.conexionTransaccional == null){
+                    close(stmt);
+                    close(rs);
+                    
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
+        return estadia;
+    }
     
 }

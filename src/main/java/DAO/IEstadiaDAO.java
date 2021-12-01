@@ -17,4 +17,5 @@ public interface IEstadiaDAO {
     public List<Pasajero> obtenerPasajerosEstadia(int idEstadia);
     public Estadia obtenerUltimaEstadia(String nroHabitacion);
     public List<OcupadaPor> obtenerOcupantesEstadia(int idEstadia) throws SQLException;
+    public Estadia obtenerEstadia(int idEstadia) throws SQLException;
 }

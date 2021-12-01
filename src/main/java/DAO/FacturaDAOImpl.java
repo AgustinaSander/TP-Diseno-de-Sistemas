@@ -14,8 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class FacturaDAOImpl implements IFacturaDAO{
     private Connection conexionTransaccional;
@@ -44,6 +43,7 @@ public class FacturaDAOImpl implements IFacturaDAO{
             stmt.setInt(1,idEstadia);
             rs = stmt.executeQuery();
             Factura factura = null;
+          
             while(rs.next()){
                 //Por cada factura, obtengo sus items en el ItemFacturaDAO
                 if(rs.getString("tipoFactura") == "A"){
@@ -65,10 +65,12 @@ public class FacturaDAOImpl implements IFacturaDAO{
                 }
 
                 factura.setPersona(persona);
+                //Busco la lista de items de esa factura
+                List<ItemFactura> listaItems = new ItemFacturaDAOImpl(conn).obtenerItemsFactura(factura);
+                factura.setListaItemsFactura(listaItems);
+                
                 facturas.add(factura);
             }
-            
-
         }finally{
             try {
                 close(stmt);

@@ -7,8 +7,6 @@ import java.util.List;
 public class EstadiaDTO {
     private int idEstadia;
     private int idHabitacion;
-    private int idTipoHabitacion;
-    private String tipoHabitacion;
     private Date fechaDesde;
     private Date fechaHasta;
     private Float precio;
@@ -18,17 +16,15 @@ public class EstadiaDTO {
     public EstadiaDTO() {
     }
 
-    public EstadiaDTO(int idHabitacion, Date fechaDesde, Date fechaHasta) {
-        this.idHabitacion = idHabitacion;
+    public EstadiaDTO(int idEstadia, Date fechaDesde, Date fechaHasta) {
+        this.idEstadia = idEstadia;
         this.fechaDesde = fechaDesde;
         this.fechaHasta = fechaHasta;
     }
 
-    public EstadiaDTO(int idEstadia, int idHabitacion, int idTipoHabitacion, String tipoHabitacion, Date fechaDesde, Date fechaHasta, Float precio) {
+    public EstadiaDTO(int idEstadia, int idHabitacion, Date fechaDesde, Date fechaHasta, Float precio) {
         this.idEstadia = idEstadia;
         this.idHabitacion = idHabitacion;
-        this.idTipoHabitacion = idTipoHabitacion;
-        this.tipoHabitacion = tipoHabitacion;
         this.fechaDesde = fechaDesde;
         this.fechaHasta = fechaHasta;
         this.precio = precio;
@@ -58,22 +54,6 @@ public class EstadiaDTO {
         this.fechaHasta = fechaHasta;
     }
 
-    public int getIdTipoHabitacion() {
-        return idTipoHabitacion;
-    }
-
-    public void setIdTipoHabitacion(int idTipoHabitacion) {
-        this.idTipoHabitacion = idTipoHabitacion;
-    }
-
-    public String getTipoHabitacion() {
-        return tipoHabitacion;
-    }
-
-    public void setTipoHabitacion(String tipoHabitacion) {
-        this.tipoHabitacion = tipoHabitacion;
-    }
-
     public int getIdEstadia() {
         return idEstadia;
     }
@@ -100,7 +80,7 @@ public class EstadiaDTO {
 
     @Override
     public String toString() {
-        return "EstadiaDTO{" + "idEstadia=" + idEstadia + ", idHabitacion=" + idHabitacion + ", idTipoHabitacion=" + idTipoHabitacion + ", tipoHabitacion=" + tipoHabitacion + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + ", precio=" + precio + ", listaPasajeros=" + listaPasajeros + '}';
+        return "EstadiaDTO{" + "idEstadia=" + idEstadia + ", idHabitacion=" + idHabitacion + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + ", precio=" + precio + ", listaPasajeros=" + listaPasajeros + '}';
     }
 
 

@@ -45,9 +45,9 @@ public class PasajeroDAOImpl implements IPasajeroDAO{
             }
         }finally{
             try {
-                close(stmt);
-                close(rs);
                 if(this.conexionTransaccional == null){
+                    close(stmt);
+                    close(rs);
                     close(conn);
                 }
             } catch (SQLException ex) {

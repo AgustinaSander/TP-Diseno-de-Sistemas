@@ -172,7 +172,7 @@ public class SeleccionFechasEstadoHabitacion extends javax.swing.JDialog {
         }
         else{
             this.dispose();
-            new MostrarEstadoHabitaciones(null,true,fechaDesdeField.getDate(), fechaHastaField.getDate(), titulo).setVisible(true);
+            new MostrarEstadoHabitaciones(null,true,fechaDesdeField.getDate(), fechaHastaField.getDate(), titulo, null).setVisible(true);
         }
     }//GEN-LAST:event_siguienteBtnActionPerformed
 

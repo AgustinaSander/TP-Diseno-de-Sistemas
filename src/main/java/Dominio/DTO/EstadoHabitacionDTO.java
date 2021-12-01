@@ -5,16 +5,16 @@ import java.util.Date;
 
 public class EstadoHabitacionDTO {
     private int idEstado;
-    private String fecha;
+    private Date fecha;
     private String estado;
 
-    public EstadoHabitacionDTO(int idEstado, String fecha, String estado) {
+    public EstadoHabitacionDTO(int idEstado, Date fecha, String estado) {
         this.idEstado = idEstado;
         this.fecha = fecha;
         this.estado = estado;
     }
 
-    public EstadoHabitacionDTO(String fecha) {
+    public EstadoHabitacionDTO(Date fecha) {
         this.fecha = fecha;
     }
 
@@ -26,11 +26,11 @@ public class EstadoHabitacionDTO {
         this.idEstado = idEstado;
     }
 
-    public String getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
 

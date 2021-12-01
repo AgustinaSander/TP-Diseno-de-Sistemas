@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface IServicioDAO {
     public List<Servicio> obtenerServiciosEstadia(int idEstadia) throws SQLException;
-    
+    public Servicio obtenerServicio(int idServicio) throws SQLException;
 }

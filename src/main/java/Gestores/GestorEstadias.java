@@ -5,16 +5,20 @@ import DAO.EstadiaDAOImpl;
 import DAO.FacturaDAOImpl;
 import DAO.IEstadiaDAO;
 import DAO.IFacturaDAO;
+import DAO.IItemFacturaDAO;
 import DAO.IServicioDAO;
+import DAO.ItemFacturaDAOImpl;
 import DAO.ServicioDAOImpl;
 import Dominio.DTO.EstadiaDTO;
 import Dominio.DTO.GestionarPasajeroDTO;
+import Dominio.DTO.ItemDTO;
 import Dominio.DTO.PasajeroDTO;
-import Dominio.DTO.ServicioDTO;
-
 import Dominio.Estadia;
 import Dominio.Factura;
 import Dominio.Habitacion;
+import Dominio.ItemEstadia;
+import Dominio.ItemFactura;
+import Dominio.ItemServicio;
 import Dominio.OcupadaPor;
 import Dominio.Pasajero;
 import Dominio.Servicio;
@@ -26,8 +30,6 @@ import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class GestorEstadias {
@@ -105,7 +107,7 @@ public class GestorEstadias {
         Estadia e = estadiaDAO.obtenerUltimaEstadia(nroHabitacion);
         
         //Creo la estadiaDTO
-        EstadiaDTO estadia = new EstadiaDTO(e.getHabitacion().getIdHabitacion(), e.getFechaIngreso(), e.getFechaEgreso());
+        EstadiaDTO estadia = new EstadiaDTO(e.getIdEstadia(), e.getHabitacion().getIdHabitacion(),e.getFechaIngreso(), e.getFechaEgreso() ,e.getHabitacion().getPrecio());
         
         List<PasajeroDTO> listaPasajeros = new ArrayList<>();
         for(OcupadaPor o : e.getListaOcupadaPor()){
@@ -118,20 +120,65 @@ public class GestorEstadias {
         return estadia;
     }
 
-    public List<ServicioDTO> obtenerServicios(int idEstadia) {
-        List<ServicioDTO> servicios = new ArrayList<>();
-        
-        IServicioDAO servicioDAO = new ServicioDAOImpl();
-        List<Servicio> serviciosEstadia = new ArrayList<>();
-        try {
-            serviciosEstadia = servicioDAO.obtenerServiciosEstadia(idEstadia);
-        } catch (SQLException ex) {
-            ex.printStackTrace(System.out);
-        }
+    public List<ItemDTO> obtenerItemsAFacturar(int idEstadia, String hora) {
+        List<ItemDTO> itemsDTO = new ArrayList<>();
+ 
+        //Recupero los servicios de esa estadia
+        List<Servicio> serviciosEstadia = obtenerServicios(idEstadia);
         
         //Recupero las facturas de esa estadia
         List<Factura> facturasEstadia = obtenerFacturas(idEstadia);
-
+        
+        //Se realiza una "Resta" para obtener los items que faltan facturar
+        //Primero genero los items de estadia que falta facturar
+        //Obtengo los itemsEstadia e itemsServicio de la lista de itemsFacturados
+        List<ItemEstadia> itemsEstadiaFacturados = new ArrayList<>();
+        List<ItemServicio> itemsServicioFacturados = new ArrayList<>();
+        
+        for(Factura f : facturasEstadia){
+            List<ItemFactura> items = f.getListaItemsFactura();
+            for(ItemFactura i : items){
+                //Si es item estadia lo guardo en lista itemsEstadiaFacturados
+                if(i instanceof ItemEstadia){
+                    itemsEstadiaFacturados.add((ItemEstadia) i);
+                }
+                else{
+                //Sino en lista itemsServicioEstadias
+                    itemsServicioFacturados.add((ItemServicio) i);
+                }
+            }
+        } 
+        
+        //Tengo la lista de todos los servicios consumidos en la estadia, entonces por cada item servicio voy viendo el servicio que tiene dentro y lo saco de la lista de servicios consumidos en la estadia => me van a quedar solo los que no fueron facturados
+        List<Servicio> serviciosNoFacturados = new ArrayList<>();
+        
+        for(ItemServicio itemServicio : itemsServicioFacturados){
+            //Obtengo el id del servicio del item y busco el mismo servicio en la lista de servicios
+            for(Servicio s : serviciosEstadia){
+                if(s.getIdServicio() == itemServicio.getServicio().getIdServicio()){
+                    //Me fijo si se facturo toda la cantidad del servicio consumida
+                    //Si no ocurrio lo agrego a la lista de serviciosNoFacturados
+                    if(s.getCantidad() > itemServicio.getCantidad()){
+                        
+                        serviciosNoFacturados.add()
+                    }
+                }
+            }
+            
+        }
+        
+        
+        return itemsDTO;
+    }
+    
+    public List<Servicio> obtenerServicios(int idEstadia){
+        IServicioDAO servicioDAO = new ServicioDAOImpl();
+        List<Servicio> servicios = new ArrayList<>();
+        try {
+            servicios = servicioDAO.obtenerServiciosEstadia(idEstadia);
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
         return servicios;
     }
     
@@ -146,4 +193,5 @@ public class GestorEstadias {
         
         return facturas;
     }
+    
 }

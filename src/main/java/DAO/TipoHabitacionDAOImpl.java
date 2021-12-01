@@ -42,6 +42,14 @@ public class TipoHabitacionDAOImpl implements ITipoHabitacionDAO{
             }
             
             conn.commit();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+            try {
+                conn.rollback();
+                System.out.println("Se hace rollback");
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
         } finally{
             try {
                 close(stmt);

@@ -234,8 +234,8 @@ public class ElegirResponsableDePago extends javax.swing.JDialog {
 
     private void facturarTerceroBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facturarTerceroBtnActionPerformed
         this.dispose();
-        //TENGO QUE VER DE PASARLE LA ESTADIA Y LA HORA DESPUES
-        new BusquedaResponsableDePago(null, true).setVisible(true);
+       
+        new BusquedaResponsableDePago(null, true, ultimaEstadia, hora).setVisible(true);
     }//GEN-LAST:event_facturarTerceroBtnActionPerformed
 
     private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed

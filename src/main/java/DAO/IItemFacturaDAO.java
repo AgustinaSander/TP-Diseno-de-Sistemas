@@ -7,5 +7,5 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IItemFacturaDAO {
-   public List<ItemFactura> obtenerItemsFactura(int idFactura) throws SQLException;
+   public List<ItemFactura> obtenerItemsFactura(Factura factura) throws SQLException;
 }

@@ -1,6 +1,7 @@
 
 package Paneles;
 
+import Dominio.DTO.EstadiaDTO;
 import Dominio.DTO.ResponsableDTO;
 import static Gestores.GestorResponsablePago.getInstanceResponsable;
 import java.awt.Color;
@@ -11,7 +12,11 @@ import javax.swing.JOptionPane;
 
 public class BusquedaResponsableDePago extends javax.swing.JDialog {
 
-    public BusquedaResponsableDePago(java.awt.Frame parent, boolean modal) {
+    private EstadiaDTO estadia;
+    private String hora;
+    private ResponsableDTO responsable;
+    
+    public BusquedaResponsableDePago(java.awt.Frame parent, boolean modal, EstadiaDTO estadia, String hora) {
         super(parent, modal);
         initComponents();
         this.setTitle("Facturacion");
@@ -150,11 +155,19 @@ public class BusquedaResponsableDePago extends javax.swing.JDialog {
         if(cuitField.getText().length() == 0){
             JOptionPane.showMessageDialog(this, "Funcionalidad Dar Alta Responsable de Pago no disponible", null,JOptionPane.ERROR_MESSAGE);
         }
+        else{
+            //Ir a interfaz facturacion
+            new Facturacion(null, true, estadia, responsable, hora).setVisible(true);
+        }
         
     }//GEN-LAST:event_aceptarBtnActionPerformed
 
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
-        // TODO add your handling code here:
+        Object[] opciones = {"SI","NO"};
+        int confirmacion = JOptionPane.showOptionDialog(this, "¿Desea cancelar la seleccion del tercero?","Cancelar seleccion",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE, null,opciones,null);
+        if(confirmacion == JOptionPane.OK_OPTION){
+            this.dispose();
+        }
     }//GEN-LAST:event_cancelarBtnActionPerformed
 
    

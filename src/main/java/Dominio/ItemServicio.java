@@ -15,8 +15,8 @@ public class ItemServicio extends ItemFactura{
         this.servicio = servicio;
     }
 
-    public ItemServicio(int cantidad, float precioUnitario, Servicio servicio, int idItemFactura, String descripcion, float precioItem, Factura factura) {
-        super(idItemFactura, descripcion, precioItem, factura);
+    public ItemServicio(int cantidad, float precioUnitario, Servicio servicio, int idItemFactura, String descripcion, float precioItem) {
+        super(idItemFactura, descripcion, precioItem);
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.servicio = servicio;

@@ -17,8 +17,8 @@ public class ItemEstadia extends ItemFactura{
         this.estadia = estadia;
     }
 
-    public ItemEstadia(Date desde, Date hasta, Estadia estadia, int idItemFactura, String descripcion, float precioItem, Factura factura) {
-        super(idItemFactura, descripcion, precioItem, factura);
+    public ItemEstadia(Date desde, Date hasta, Estadia estadia, int idItemFactura, String descripcion, float precioItem) {
+        super(idItemFactura, descripcion, precioItem);
         this.desde = desde;
         this.hasta = hasta;
         this.estadia = estadia;

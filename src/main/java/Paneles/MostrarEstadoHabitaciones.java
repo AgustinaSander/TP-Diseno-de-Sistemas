@@ -13,10 +13,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
@@ -27,7 +29,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
     private Date hasta;
     private List<HabitacionDTO> listaHabitaciones;
     
-    public MostrarEstadoHabitaciones(java.awt.Frame parent, boolean modal, Date fechaDesde, Date fechaHasta, String titulo) {
+    public MostrarEstadoHabitaciones(java.awt.Frame parent, boolean modal, Date fechaDesde, Date fechaHasta, String titulo, String tipoHabitacionSeleccionado) {
         super(parent, modal);
 
         this.desde = fechaDesde;
@@ -43,16 +45,24 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         for(TipoDeHabitacionDTO tipo: tipoDeHabitaciones){
             tipoHabCombo.addItem(tipo.getNombre());
         }
+        
+        //Seleccion de tipo de habitacion
+        if(tipoHabitacionSeleccionado == null){
+            tipoHab.setSelectedItem("Individual Estandar");
+            mostrarTablaTipoHab("Individual Estandar");
+        }
+        else{
+            tipoHab.setSelectedItem(tipoHabitacionSeleccionado);
+            mostrarTablaTipoHab(tipoHabitacionSeleccionado);
+        }
+        
+        
         tipoHabCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tipoHabComboActionPerformed(evt);
             }
         });
         
-        
-        //Seleccionamos por default la Individual Estandar
-        tipoHabCombo.setSelectedIndex(0); //Al realizar una seleccion se ejecuta el evento del tipoHabCombo
-
         initComponents();
         
         //Pongo los valores de las fechas en el titulo
@@ -62,9 +72,11 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         this.setTitle(titulo);
         this.setLocationRelativeTo(null);
         
+        
+        
     }
 
-    public void mostrarTablaTipoHab(String tipoHab){
+     public void mostrarTablaTipoHab(String tipoHab){
         
         //Obtenemos un map con clave idHabitacion y valor una lista de objetos EstadoHabitacionDTO que indican el estado de esa habitacion en una fecha
         //Cada habitacion va a tener asociada una lista con X estados (X va a ser la cantidad de dias del rango de fechas seleccionado)
@@ -75,8 +87,8 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         this.listaHabitaciones = habitaciones;
         
         //Obtengo un arreglo con todas las fechas intermedias del intervalo
-        List<String> listaFechas = getInstanceHabitaciones().obtenerFechasIntermedias(desde, hasta);
-       
+        List<Date> listaFechas = getInstanceHabitaciones().obtenerFechasIntermedias(desde, hasta);
+        
         //Creo la tabla
         String [] nombreColumnas = new String[habitaciones.size()+1];
         nombreColumnas[0] = "Fecha";
@@ -110,10 +122,11 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         pintarCeldas();
         table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         table.setRowSelectionAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);
         table.setColumnSelectionAllowed(false);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setCellSelectionEnabled(true);
-        
+       
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBounds(40,100,800,350);
         this.setLayout(null);
@@ -121,9 +134,16 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         this.add(scroll, BorderLayout.CENTER);
        
     }
+     
+    private void tipoHabComboActionPerformed(java.awt.event.ActionEvent evt){
+        //Se cierra la interfaz y se abre la nueva con el valor seleccionado
+        this.dispose();
+        new MostrarEstadoHabitaciones(null,true,desde, hasta, "Ocupar Habitacion", tipoHab.getSelectedItem().toString()).setVisible(true);
+        
+    }
     
     //Busca el estado de la habitacion en una fecha
-    public String obtenerEstado(String fecha, HabitacionDTO hab, List<EstadoHabitacionDTO> estados){
+    public String obtenerEstado(Date fecha, HabitacionDTO hab, List<EstadoHabitacionDTO> estados){
         Boolean estadoEncontrado = false;
         String estado = null;
         
@@ -231,20 +251,21 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(212, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(desdeFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4)
-                .addGap(18, 18, 18)
-                .addComponent(hastaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(158, 158, 158))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(642, Short.MAX_VALUE)
-                .addComponent(cancelarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(aceptarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(desdeFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(hastaFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(158, 158, 158))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(cancelarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(aceptarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(42, 42, 42))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,9 +291,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -351,10 +370,6 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_cancelarBtnActionPerformed
 
-    private void tipoHabComboActionPerformed(java.awt.event.ActionEvent evt){
-        //Se realiza la obtencion de datos y carga de la tabla
-        mostrarTablaTipoHab(tipoHab.getSelectedItem().toString());
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton aceptarBtn;

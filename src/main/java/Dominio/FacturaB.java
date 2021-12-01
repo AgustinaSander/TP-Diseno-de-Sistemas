@@ -13,12 +13,12 @@ public class FacturaB extends Factura{
         super(idFactura, fecha, importeNeto, importeTotal, pagada);
     }
 
-    public FacturaB(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona) {
-        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona);
-    }
-
     public FacturaB(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito) {
         super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, notaCredito);
+    }
+
+    public FacturaB(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito, List<ItemFactura> listaItemsFactura, Estadia estadia) {
+        super(idFactura, fecha, importeNeto, importeTotal, pagada, persona, notaCredito, listaItemsFactura, estadia);
     }
     
     public int getIdFactura() {

@@ -80,6 +80,32 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
         }
         return habitacion;
     }
+    
+    @Override
+    public List<Habitacion> obtenerHabitaciones() throws SQLException{
+        List<Habitacion> habitaciones = new ArrayList<>();
+        try {
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+             
+            stmt = conn.prepareStatement("SELECT * FROM `habitacion`");
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                habitaciones.add(new Habitacion(rs.getInt("id"), rs.getString("nro"), rs.getFloat("precio")));
+            }
+            
+        }finally{
+            try {
+                if(this.conexionTransaccional == null){
+                    close(stmt);
+                    close(rs);
+                    close(conn);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        return habitaciones;
+    }
 
     @Override
     public List<Habitacion> obtenerHabitacionesDeUnTipo(int idTipo) throws SQLException{
