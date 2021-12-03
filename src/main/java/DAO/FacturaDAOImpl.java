@@ -85,4 +85,68 @@ public class FacturaDAOImpl implements IFacturaDAO{
         
         return facturas;
     }
+    
+    @Override
+    public int crearFactura(Factura factura) throws SQLException{
+        int idFactura = 0;
+        
+        try {
+            conn = getConnection();
+            this.conexionTransaccional = conn;
+            
+            if(conn.getAutoCommit()){
+                conn.setAutoCommit(false);
+            }
+            
+            stmt = conn.prepareStatement("INSERT INTO `factura`(`idPersona`, `idNotaDeCredito`, `idEstadia`, `fecha`, `importeNeto`, `importeTotal`, `pagada`, `tipoFactura`, `montoIVA`) VALUES (?, null, ?, ?, ?, ?, false, ?, ?)");
+            stmt.setInt(1, factura.getPersona().getIdPersona());
+            stmt.setInt(2, factura.getEstadia().getIdEstadia());
+            java.sql.Date fecha = new java.sql.Date(factura.getFecha().getTime());
+            stmt.setDate(3, fecha);
+            stmt.setFloat(4, factura.getImporteNeto());
+            stmt.setFloat(5, factura.getImporteTotal());
+            if(factura instanceof FacturaA){
+                stmt.setString(6,"A");
+            }
+            else{
+                stmt.setString(6,"B");
+            }
+            stmt.setFloat(7, factura.getImporteTotal() - factura.getImporteNeto());
+            
+            stmt.executeUpdate();
+            
+            //Recupero el idFactura generado por la base
+            stmt = conn.prepareStatement("SELECT MAX(idFactura) FROM `factura`;");
+            rs = stmt.executeQuery();
+            if(rs.next()){
+                idFactura = rs.getInt("MAX(idFactura)");
+            }
+            
+            //Agregamos los items de la factura con ItemFacturaDAO
+            new ItemFacturaDAOImpl(conn).crearItemsFactura(factura.getListaItemsFactura(), idFactura);
+            
+            
+            conn.commit();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+            try {
+                conn.rollback();
+                System.out.println("Se hace rollback");
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        }    
+        finally{
+            try {
+                close(stmt);
+                close(conn);
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        
+        return idFactura;
+    }
+    
+    
 }

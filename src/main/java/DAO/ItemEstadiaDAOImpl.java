@@ -34,7 +34,7 @@ public class ItemEstadiaDAOImpl implements IItemEstadiaDAO{
         ItemFactura item = null;
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
-            stmt = conn.prepareStatement("SELECT * FROM itemestadia AS ie, itemfactura AS if WHERE ie.idItemFactura = ? AND ie.idItemFactura = if.idItemFactura");
+            stmt = conn.prepareStatement("SELECT * FROM itemestadia AS ie, itemfactura AS it WHERE ie.idItemFactura = ? AND ie.idItemFactura = it.idItemFactura");
             stmt.setInt(1, idItem);
             rs = stmt.executeQuery();
             
@@ -42,14 +42,13 @@ public class ItemEstadiaDAOImpl implements IItemEstadiaDAO{
                 //Obtenemos la estadia a la que hace referencia
                 Estadia estadia = new EstadiaDAOImpl(conn).obtenerEstadia(rs.getInt("idEstadia"));
                 
-                item = new ItemEstadia( new Date(rs.getDate("desde").getTime()), new Date(rs.getDate("hasta").getTime()), estadia, idItem, rs.getString("descripcion"), rs.getFloat("precioitem"));
+                item = new ItemEstadia(estadia, idItem, rs.getString("descripcion"), rs.getFloat("precioitem"), rs.getFloat("precioUnitario"), rs.getInt("cantidad"), rs.getBoolean("extra"));
             }
            
             
         }finally{
             try {
                 close(stmt);
-                close(rs);
                 if(this.conexionTransaccional == null){
                     close(conn);
                 }

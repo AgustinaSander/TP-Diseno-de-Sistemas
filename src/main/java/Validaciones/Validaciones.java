@@ -1,11 +1,15 @@
 
 package Validaciones;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.*;
 
 public class Validaciones {
@@ -87,7 +91,7 @@ public class Validaciones {
         if(hora.length() == 0){
             return false;
         }
-        Pattern pat = Pattern.compile("(([0-1]?\\d)|2([0-3])):([0-5]?\\d)");
+        Pattern pat = Pattern.compile("(([0-1]\\d)|2([0-3])):([0-5]\\d)");
         Matcher mat = pat.matcher(hora);
         if(mat.matches()){
             return true;
@@ -102,5 +106,30 @@ public class Validaciones {
         Period periodo = Period.between(fecha, ahora);
         
         return periodo.getYears();
+    }
+     
+    public static List<String> obtenerFechasIntermedias(Date fechaDesde, Date fechaHasta){
+        List<String> fechas = new ArrayList<>();
+    
+        Calendar comienzo = Calendar.getInstance(); 
+        comienzo.setTime(fechaDesde);
+        comienzo.set(Calendar.HOUR_OF_DAY, 0);  
+        comienzo.set(Calendar.MINUTE, 0);  
+        comienzo.set(Calendar.SECOND, 0);  
+        comienzo.set(Calendar.MILLISECOND, 0);
+        Calendar fin = Calendar.getInstance();
+        fin.setTime(fechaHasta);
+        fin.set(Calendar.HOUR_OF_DAY, 0);  
+        fin.set(Calendar.MINUTE, 0);  
+        fin.set(Calendar.SECOND, 0);  
+        fin.set(Calendar.MILLISECOND, 0);
+        while(comienzo.before(fin)){
+            fechas.add(new SimpleDateFormat("dd-MM-yyyy").format(comienzo.getTime()));
+            comienzo.add(Calendar.DAY_OF_YEAR,1);
+        }
+
+        fechas.add(new SimpleDateFormat("dd-MM-yyyy").format(fin.getTime()));
+        
+        return fechas;
     }
 }

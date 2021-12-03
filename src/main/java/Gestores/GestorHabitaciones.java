@@ -22,13 +22,12 @@ import Dominio.Inhabilitado;
 import Dominio.Reserva;
 import Dominio.TipoDeHabitacion;
 import Validaciones.FechasEstadoHabitaciones;
+import static Validaciones.Validaciones.obtenerFechasIntermedias;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import static java.util.Objects.isNull;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 
 public class GestorHabitaciones {
@@ -78,7 +77,7 @@ public class GestorHabitaciones {
         }
         
         for(TipoDeHabitacion tipo : tipos){
-            tiposHabitaciones.add(new TipoDeHabitacionDTO(tipo.getIdTipoHabitacion(), tipo.getNombre()));
+            tiposHabitaciones.add(new TipoDeHabitacionDTO(tipo.getIdTipoHabitacion(), tipo.getNombre(), tipo.getCapacidad()));
         }
         
         return tiposHabitaciones;
@@ -129,14 +128,14 @@ public class GestorHabitaciones {
         Map <Integer, List<EstadoHabitacionDTO>> listaEstados = new HashMap<>();
         
         //Obtengo la lista de fechas entre FechaDesde y FechaHasta
-        List<Date> listaFechas = obtenerFechasIntermedias(fechaDesde, fechaHasta);
+        List<String> listaFechas = obtenerFechasIntermedias(fechaDesde, fechaHasta);
         
         //Agrego todas las claves que van a ser los idHabitaciones
         for(Habitacion hab : habitaciones){
             listaEstados.put(hab.getIdHabitacion(), new ArrayList<>());
             
             //Creo una lista de fechas auxiliar para ir borrando las que ya fueron guardadas
-            List<Date> auxFechas = new ArrayList<>(listaFechas);
+            List<String> auxFechas = new ArrayList<>(listaFechas);
             
             //Filtro las estadias de esa habitacion
             List<Estadia> estadiasDeHab = recuperarEstadiasDeUnaHabitacion(listaEstadias, hab.getIdHabitacion());
@@ -151,11 +150,15 @@ public class GestorHabitaciones {
                     List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                     //Obtengo todas las fechas intermedias de la estadia
-                    List<Date> fechasEstadia = obtenerFechasIntermedias(e.getFechaIngreso(),e.getFechaEgreso()); 
+                    List<String> fechasEstadia = obtenerFechasIntermedias(e.getFechaIngreso(),e.getFechaEgreso()); 
 
-                    for(Date fecha : fechasEstadia){
+                    for(String fecha : fechasEstadia){
                         if(auxFechas.indexOf(fecha) != -1){
-                            estados.add(new EstadoHabitacionDTO(e.getIdEstadia(), fecha, "Ocupada"));
+                            try {
+                                estados.add(new EstadoHabitacionDTO(e.getIdEstadia(), new SimpleDateFormat("dd-MM-yyyy").parse(fecha), "Ocupada"));
+                            } catch (ParseException ex) {
+                                ex.printStackTrace(System.out);
+                            }
                             auxFechas.remove(auxFechas.indexOf(fecha));
                         }  
                     }
@@ -176,11 +179,15 @@ public class GestorHabitaciones {
                         List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                         //Obtengo todas las fechas intermedias de la reserva
-                        List<Date> fechasReserva = obtenerFechasIntermedias(fr.getFechaIngreso(),fr.getFechaEgreso()); 
+                        List<String> fechasReserva = obtenerFechasIntermedias(fr.getFechaIngreso(),fr.getFechaEgreso()); 
 
-                        for(Date fecha : fechasReserva){
+                        for(String fecha : fechasReserva){
                             if(auxFechas.indexOf(fecha) != -1){
-                                estados.add(new EstadoHabitacionDTO(reserva.getIdReserva(), fecha, "Reservada"));
+                                try {
+                                    estados.add(new EstadoHabitacionDTO(reserva.getIdReserva(), new SimpleDateFormat("dd-MM-yyyy").parse(fecha), "Reservada"));
+                                } catch (ParseException ex) {
+                                    ex.printStackTrace(System.out);
+                                }
                                 auxFechas.remove(auxFechas.indexOf(fecha));
                             }
                         }
@@ -202,11 +209,15 @@ public class GestorHabitaciones {
                     List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                     //Obtengo todas las fechas intermedias de la inhabilitacion
-                    List<Date> fechasInhabilitado = obtenerFechasIntermedias(e.getFechaInicio(),e.getFechaFin());
+                    List<String> fechasInhabilitado = obtenerFechasIntermedias(e.getFechaInicio(),e.getFechaFin());
 
-                    for(Date fecha : fechasInhabilitado){
+                    for(String fecha : fechasInhabilitado){
                         if(auxFechas.indexOf(fecha) != -1){
-                            estados.add(new EstadoHabitacionDTO(e.getIdInhabilitado(), fecha, "Inhabilitada"));
+                            try {
+                                estados.add(new EstadoHabitacionDTO(e.getIdInhabilitado(), new SimpleDateFormat("dd-MM-yyyy").parse(fecha), "Inhabilitada"));
+                            } catch (ParseException ex) {
+                                ex.printStackTrace(System.out);
+                            }
                             auxFechas.remove(auxFechas.indexOf(fecha));
                         }  
                     }
@@ -220,7 +231,11 @@ public class GestorHabitaciones {
             
             while(!auxFechas.isEmpty()){
                 List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
-                estados.add(new EstadoHabitacionDTO(0,auxFechas.get(0),"Desocupada"));
+                try {
+                    estados.add(new EstadoHabitacionDTO(0,new SimpleDateFormat("dd-MM-yyyy").parse(auxFechas.get(0)),"Desocupada"));
+                } catch (ParseException ex) {
+                    ex.printStackTrace(System.out);
+                }
                 listaEstados.put(hab.getIdHabitacion(), estados);
                 auxFechas.remove(0);
             }       
@@ -250,30 +265,6 @@ public class GestorHabitaciones {
         return inhabilitados;
     }
     
-    public List<Date> obtenerFechasIntermedias(Date fechaDesde, Date fechaHasta){
-        List<Date> fechas = new ArrayList<>();
-    
-        Calendar comienzo = Calendar.getInstance(); 
-        comienzo.setTime(fechaDesde);
-        comienzo.set(Calendar.HOUR_OF_DAY, 0);  
-        comienzo.set(Calendar.MINUTE, 0);  
-        comienzo.set(Calendar.SECOND, 0);  
-        comienzo.set(Calendar.MILLISECOND, 0);
-        Calendar fin = Calendar.getInstance();
-        fin.setTime(fechaHasta);
-        fin.set(Calendar.HOUR_OF_DAY, 0);  
-        fin.set(Calendar.MINUTE, 0);  
-        fin.set(Calendar.SECOND, 0);  
-        fin.set(Calendar.MILLISECOND, 0);
-        while(comienzo.before(fin)){
-            fechas.add(comienzo.getTime());
-            comienzo.add(Calendar.DAY_OF_YEAR,1);
-        }
-        fechas.add(fin.getTime());
-
-        return fechas;
-    }
-
     Habitacion obtenerHabitacion(int idHabitacion) {
         habitacionDAO = new HabitacionDAOImpl();
         Habitacion habitacion = null;
@@ -329,14 +320,14 @@ public class GestorHabitaciones {
         Map <Integer, List<EstadoHabitacionDTO>> listaEstados = new HashMap<>();
         
         //Obtengo la lista de fechas entre FechaDesde y FechaHasta
-        List<Date> listaFechas = obtenerFechasIntermedias(fechaDesde, fechaHasta);
+        List<String> listaFechas = obtenerFechasIntermedias(fechaDesde, fechaHasta);
         
         //Agrego todas las claves que van a ser los idHabitaciones
         for(Habitacion hab : habitaciones){
             listaEstados.put(hab.getIdHabitacion(), new ArrayList<>());
             
             //Creo una lista de fechas auxiliar para ir borrando las que ya fueron guardadas
-            List<Date> auxFechas = new ArrayList<>(listaFechas);
+            List<String> auxFechas = new ArrayList<>(listaFechas);
             
             //Filtro las estadias de esa habitacion
             List<Estadia> estadiasDeHab = recuperarEstadiasDeUnaHabitacion(listaEstadias, hab.getIdHabitacion());
@@ -351,11 +342,19 @@ public class GestorHabitaciones {
                     List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                     //Obtengo todas las fechas intermedias de la estadia
-                    List<Date> fechasEstadia = obtenerFechasIntermedias(e.getFechaIngreso(),e.getFechaEgreso()); 
-
-                    for(Date fecha : fechasEstadia){
+                    List<String> fechasEstadia = obtenerFechasIntermedias(e.getFechaIngreso(),e.getFechaEgreso()); 
+                    if(fechasEstadia.size()>1){
+                        fechasEstadia.remove(fechasEstadia.size()-1);
+                    }
+                    
+                    
+                    for(String fecha : fechasEstadia){
                         if(auxFechas.indexOf(fecha) != -1){
-                            estados.add(new EstadoHabitacionDTO(e.getIdEstadia(), fecha, "Ocupada"));
+                            try {
+                                estados.add(new EstadoHabitacionDTO(e.getIdEstadia(), new SimpleDateFormat("dd-MM-yyyy").parse(fecha), "Ocupada"));
+                            } catch (ParseException ex) {
+                                ex.printStackTrace(System.out);
+                            }
                             auxFechas.remove(auxFechas.indexOf(fecha));
                         }  
                     }
@@ -376,11 +375,15 @@ public class GestorHabitaciones {
                         List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                         //Obtengo todas las fechas intermedias de la reserva
-                        List<Date> fechasReserva = obtenerFechasIntermedias(fr.getFechaIngreso(),fr.getFechaEgreso()); 
+                        List<String> fechasReserva = obtenerFechasIntermedias(fr.getFechaIngreso(),fr.getFechaEgreso()); 
 
-                        for(Date fecha : fechasReserva){
+                        for(String fecha : fechasReserva){
                             if(auxFechas.indexOf(fecha) != -1){
-                                estados.add(new EstadoHabitacionDTO(reserva.getIdReserva(), fecha, "Reservada"));
+                                try {
+                                    estados.add(new EstadoHabitacionDTO(reserva.getIdReserva(), new SimpleDateFormat("dd-MM-yyyy").parse(fecha), "Reservada"));
+                                } catch (ParseException ex) {
+                                    ex.printStackTrace(System.out);
+                                }
                                 auxFechas.remove(auxFechas.indexOf(fecha));
                             }
                         }
@@ -402,11 +405,15 @@ public class GestorHabitaciones {
                     List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
 
                     //Obtengo todas las fechas intermedias de la inhabilitacion
-                    List<Date> fechasInhabilitado = obtenerFechasIntermedias(e.getFechaInicio(),e.getFechaFin());
+                    List<String> fechasInhabilitado = obtenerFechasIntermedias(e.getFechaInicio(),e.getFechaFin());
 
-                    for(Date fecha : fechasInhabilitado){
+                    for(String fecha : fechasInhabilitado){
                         if(auxFechas.indexOf(fecha) != -1){
-                            estados.add(new EstadoHabitacionDTO(e.getIdInhabilitado(), fecha, "Inhabilitada"));
+                            try {
+                                estados.add(new EstadoHabitacionDTO(e.getIdInhabilitado(), new SimpleDateFormat("dd-MM-yyyy").parse(fecha), "Inhabilitada"));
+                            } catch (ParseException ex) {
+                                ex.printStackTrace(System.out);
+                            }
                             auxFechas.remove(auxFechas.indexOf(fecha));
                         }  
                     }
@@ -420,7 +427,11 @@ public class GestorHabitaciones {
             
             while(!auxFechas.isEmpty()){
                 List<EstadoHabitacionDTO> estados = listaEstados.get(hab.getIdHabitacion());
-                estados.add(new EstadoHabitacionDTO(0,auxFechas.get(0),"Desocupada"));
+                try {
+                    estados.add(new EstadoHabitacionDTO(0,new SimpleDateFormat("dd-MM-yyyy").parse(auxFechas.get(0)),"Desocupada"));
+                } catch (ParseException ex) {
+                    ex.printStackTrace(System.out);
+                }
                 listaEstados.put(hab.getIdHabitacion(), estados);
                 auxFechas.remove(0);
             }       

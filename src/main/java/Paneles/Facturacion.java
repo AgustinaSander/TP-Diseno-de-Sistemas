@@ -2,25 +2,111 @@
 package Paneles;
 
 import Dominio.DTO.EstadiaDTO;
-import Dominio.DTO.PasajeroDTO;
+import Dominio.DTO.ItemDTO;
+import Dominio.DTO.PersonaDTO;
 import static Gestores.GestorEstadias.getInstanceEstadias;
+import static Gestores.GestorFacturas.getInstanceFacturas;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 public class Facturacion extends javax.swing.JDialog {
 
-    public Facturacion(java.awt.Frame parent, boolean modal, EstadiaDTO estadia, PasajeroDTO pasajero, String hora) {
+    private Double montoTotal;
+    private Double montoServicio;
+    private Double montoEstadia;
+    private PersonaDTO pasajero;
+    private int idEstadia;
+    private List<ItemDTO> itemsEstadia;
+    private List<ItemDTO> itemsServicio;
+    
+    public Facturacion(java.awt.Frame parent, boolean modal, EstadiaDTO estadia, PersonaDTO pasajero, String hora) {
         super(parent, modal);
+        
+        List<ItemDTO> itemsAFacturar = getInstanceEstadias().obtenerItemsAFacturar(estadia.getIdEstadia(), hora);
+        //Si no quedan items por facturar
+        if(itemsAFacturar.size() == 0){
+            JOptionPane.showMessageDialog(this, "No quedan items por facturar", "Items facturados",JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+        }
+        
         initComponents();
         this.setTitle("Facturacion");
         this.setLocationRelativeTo(null);
+        this.montoTotal = 0.0;
+        this.montoServicio = 0.0;
+        this.montoEstadia = 0.0;
+        this.pasajero = pasajero;
+        this.idEstadia = estadia.getIdEstadia();
         
+        if(pasajero.getEsPasajero()){
+            responsableField.setText(pasajero.getNombre() + " " + pasajero.getApellido());
+        }
+        else{
+            responsableField.setText(pasajero.getRazonSocial());
+        }
         
-        responsableField.setText(pasajero.getNombre() + " " + pasajero.getApellido());
+       
         
-        //Recupero los servicios de esa estadia
-        getInstanceEstadias().obtenerItemsAFacturar(estadia.getIdEstadia(), hora);
+        //Lista donde voy a guardar solo los items estadia
+        List<ItemDTO> itemsEstadia = new ArrayList<>();
         
+        //Lista donde voy a guardar solo los items servicio
+        List<ItemDTO> itemsServicio = new ArrayList<>();
+        
+        DefaultTableModel tablaServicio = (DefaultTableModel) tablaServicios.getModel();
+        tablaServicio.setRowCount(0);
+        DefaultTableModel tablaEstadias = (DefaultTableModel) tablaEstadia.getModel();
+        tablaEstadias.setRowCount(0);
+        
+        for(ItemDTO i : itemsAFacturar){
+            if(i.getEsItemServicio()){
+                //Recupero los servicios de esa estadia
+                itemsServicio.add(i);
+                tablaServicio.addRow(new Object[]{i.getFecha(), i.getDescripcion(), i.getCantidad(), i.getMonto()});
+            }
+            else{
+                //Recupero las estadias
+                itemsEstadia.add(i);
+                tablaEstadias.addRow(new Object[]{i.getDescripcion(), i.getCantidad(), i.getMonto()});
+            }
+        }
+      
+        this.itemsEstadia = itemsEstadia;
+        this.itemsServicio = itemsServicio;
+
+        tablaServicios.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            
+            public void valueChanged(ListSelectionEvent lse) {
+                if (!lse.getValueIsAdjusting()) {
+                    montoServicio = 0.0;
+                    //Obtengo las filas seleccionadas y los montos de las mismas
+                    int [] filasSeleccionadas = tablaServicios.getSelectedRows();
+                    for(int i=0; i< filasSeleccionadas.length; i++){
+                        montoServicio += ((Number) tablaServicios.getValueAt(filasSeleccionadas[i], 3)).doubleValue() * (Integer)tablaServicios.getValueAt(filasSeleccionadas[i], 2);
+                    }
+                    actualizarMonto();
+                }
+            }
+        });
+        
+        tablaEstadia.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            public void valueChanged(ListSelectionEvent lse) {
+                if (!lse.getValueIsAdjusting()) {
+                    montoEstadia = 0.0;
+                    //Obtengo las filas seleccionadas y los montos de las mismas
+                    int [] filasSeleccionadas = tablaEstadia.getSelectedRows();
+                    for(int i=0; i< filasSeleccionadas.length; i++){
+                        montoEstadia += ((Number) tablaEstadia.getValueAt(filasSeleccionadas[i], 2)).doubleValue();
+                    }
+                    actualizarMonto();
+                }
+            }
+        });    
     }
 
     @SuppressWarnings("unchecked")
@@ -55,24 +141,28 @@ public class Facturacion extends javax.swing.JDialog {
 
             },
             new String [] {
-                "Fecha", "Descripcion", "Cantidad", "Monto", ""
+                "Descripcion", "Cantidad", "Monto"
             }
         ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
+            boolean[] canEdit = new boolean [] {
+                false, false, false
             };
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
+        tablaEstadia.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tablaEstadia);
+        if (tablaEstadia.getColumnModel().getColumnCount() > 0) {
+            tablaEstadia.getColumnModel().getColumn(0).setMinWidth(150);
+        }
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabel1.setText("Monto total acumulado : $");
 
         montoField.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        montoField.setText("jLabel2");
+        montoField.setText("0.00");
 
         jLabel2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabel2.setText("Responsable de Pago : ");
@@ -82,18 +172,22 @@ public class Facturacion extends javax.swing.JDialog {
 
             },
             new String [] {
-                "Fecha", "Descripcion", "Cantidad", "Monto", ""
+                "Fecha", "Descripcion", "Cantidad", "Monto"
             }
         ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
             };
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
+        tablaServicios.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(tablaServicios);
+        if (tablaServicios.getColumnModel().getColumnCount() > 0) {
+            tablaServicios.getColumnModel().getColumn(1).setMinWidth(150);
+        }
 
         jLabel3.setText("ESTADIA");
 
@@ -110,8 +204,8 @@ public class Facturacion extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(responsableField, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(170, 170, 170))
+                        .addComponent(responsableField, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(42, 42, 42))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(44, 44, 44)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -158,6 +252,11 @@ public class Facturacion extends javax.swing.JDialog {
         });
 
         aceptarBtn.setText("Aceptar");
+        aceptarBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aceptarBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -185,6 +284,11 @@ public class Facturacion extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void actualizarMonto(){
+        Double montoTotal = montoServicio + montoEstadia;
+        montoField.setText(montoTotal.toString());
+    }
+    
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
         Object[] opciones = {"SI","NO"};
         int confirmacion = JOptionPane.showOptionDialog(this, "¿Desea cancelar la facturacion?","Cancelar facturacion",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE, null,opciones,null);
@@ -192,6 +296,37 @@ public class Facturacion extends javax.swing.JDialog {
             this.dispose();
         }
     }//GEN-LAST:event_cancelarBtnActionPerformed
+
+    private void aceptarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarBtnActionPerformed
+        if(tablaEstadia.getSelectedRowCount() + tablaServicios.getSelectedRowCount() == 0){
+            JOptionPane.showMessageDialog(this, "Seleccione los items a facturar.", "Seleccion de items",JOptionPane.ERROR_MESSAGE);
+        }
+        else{
+            //Guardo los items seleccionados en una lista
+            List<ItemDTO> itemsEstadiaSeleccionados = new ArrayList<>();
+            List<ItemDTO> itemsServicioSeleccionados = new ArrayList<>();
+            
+            //Obtengo los item estadia seleccionados
+            int [] filasSeleccionadas = tablaEstadia.getSelectedRows();
+            for(int i=0; i < filasSeleccionadas.length; i++){
+                itemsEstadiaSeleccionados.add(itemsEstadia.get(filasSeleccionadas[i]));
+            }
+            
+            //Obtengo los item servicio seleccionados
+            filasSeleccionadas = tablaServicios.getSelectedRows();
+            for(int i=0; i < filasSeleccionadas.length ; i++){
+                itemsServicioSeleccionados.add(itemsServicio.get(filasSeleccionadas[i]));
+            }
+
+            int idFactura = getInstanceFacturas().crearFactura(itemsEstadiaSeleccionados, itemsServicioSeleccionados, pasajero , idEstadia);
+            if(idFactura > 0){
+                JOptionPane.showMessageDialog(this, "Factura generada correctamente.", "Factura exitosa",JOptionPane.INFORMATION_MESSAGE);
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Error al generar la factura.", "Factura no generada",JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_aceptarBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton aceptarBtn;

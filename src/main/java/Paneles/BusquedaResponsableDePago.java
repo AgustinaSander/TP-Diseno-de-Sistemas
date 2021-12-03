@@ -2,7 +2,7 @@
 package Paneles;
 
 import Dominio.DTO.EstadiaDTO;
-import Dominio.DTO.ResponsableDTO;
+import Dominio.DTO.PersonaDTO;
 import static Gestores.GestorResponsablePago.getInstanceResponsable;
 import java.awt.Color;
 import java.awt.event.FocusEvent;
@@ -14,13 +14,15 @@ public class BusquedaResponsableDePago extends javax.swing.JDialog {
 
     private EstadiaDTO estadia;
     private String hora;
-    private ResponsableDTO responsable;
+    private PersonaDTO responsable;
     
     public BusquedaResponsableDePago(java.awt.Frame parent, boolean modal, EstadiaDTO estadia, String hora) {
         super(parent, modal);
         initComponents();
         this.setTitle("Facturacion");
         this.setLocationRelativeTo(null);
+        this.estadia = estadia;
+        this.hora = hora;
         
         cuitField.addFocusListener(new FocusListener() {
             @Override
@@ -32,8 +34,14 @@ public class BusquedaResponsableDePago extends javax.swing.JDialog {
                     if(cuitValido){
                         cuitField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                         //Se busca la razon social
-                        ResponsableDTO responsable = getInstanceResponsable().obtenerResponsableDePago(cuitField.getText());
-                        razonSocialField.setText(responsable.getRazonSocial());
+                        responsable = getInstanceResponsable().obtenerResponsableDePago(cuitField.getText());
+                        if(responsable != null){
+                            razonSocialField.setText(responsable.getRazonSocial());
+                        }
+                        else{
+                            cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
+                            razonSocialField.setText("");
+                        }
                     }
                     else{
                         cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));

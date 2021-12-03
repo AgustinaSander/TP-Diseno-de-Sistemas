@@ -4,15 +4,13 @@ package Dominio;
 public class Habitacion {
     private int idHabitacion;
     private String numeroHabitacion;
-    private float precio;
 
     public Habitacion() {
     }
 
-    public Habitacion(int idHabitacion, String numeroHabitacion, float precio) {
+    public Habitacion(int idHabitacion, String numeroHabitacion) {
         this.idHabitacion = idHabitacion;
         this.numeroHabitacion = numeroHabitacion;
-        this.precio = precio;
     }
     
     
@@ -32,17 +30,9 @@ public class Habitacion {
         this.numeroHabitacion = numeroHabitacion;
     }
 
-    public float getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(float precio) {
-        this.precio = precio;
-    }
-
     @Override
     public String toString() {
-        return "Habitacion{" + "idHabitacion=" + idHabitacion + ", numeroHabitacion=" + numeroHabitacion + ", precio=" + precio + '}';
+        return "Habitacion{" + "idHabitacion=" + idHabitacion + ", numeroHabitacion=" + numeroHabitacion + '}';
     }
     
 }

@@ -4,40 +4,21 @@ package Dominio;
 import java.util.Date;
 
 public class ItemEstadia extends ItemFactura{
-    private Date desde;
-    private Date hasta;
     private Estadia estadia;
-
+    private Boolean extra;
+    
     public ItemEstadia() {
     }
 
-    public ItemEstadia(Date desde, Date hasta, Estadia estadia) {
-        this.desde = desde;
-        this.hasta = hasta;
+    public ItemEstadia(Estadia estadia, Boolean extra) {
         this.estadia = estadia;
+        this.extra = extra;
     }
 
-    public ItemEstadia(Date desde, Date hasta, Estadia estadia, int idItemFactura, String descripcion, float precioItem) {
-        super(idItemFactura, descripcion, precioItem);
-        this.desde = desde;
-        this.hasta = hasta;
+    public ItemEstadia(Estadia estadia, int idItemFactura, String descripcion, float precioItem, float precioUnitario, int cantidad, Boolean extra) {
+        super(idItemFactura, descripcion, precioItem, precioUnitario, cantidad);
         this.estadia = estadia;
-    }
-
-    public Date getDesde() {
-        return desde;
-    }
-
-    public void setDesde(Date desde) {
-        this.desde = desde;
-    }
-
-    public Date getHasta() {
-        return hasta;
-    }
-
-    public void setHasta(Date hasta) {
-        this.hasta = hasta;
+        this.extra = extra;
     }
 
     public Estadia getEstadia() {
@@ -48,10 +29,59 @@ public class ItemEstadia extends ItemFactura{
         this.estadia = estadia;
     }
 
+    public int getIdItemFactura() {
+        return idItemFactura;
+    }
+
+    public void setIdItemFactura(int idItemFactura) {
+        this.idItemFactura = idItemFactura;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public float getPrecioItem() {
+        return precioItem;
+    }
+
+    public void setPrecioItem(float precioItem) {
+        this.precioItem = precioItem;
+    }
+
+    public float getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(float precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Boolean getExtra() {
+        return extra;
+    }
+
+    public void setExtra(Boolean extra) {
+        this.extra = extra;
+    }
+
     @Override
     public String toString() {
-        return "ItemEstadia{" + "desde=" + desde + ", hasta=" + hasta + ", estadia=" + estadia + '}';
+        return "ItemEstadia{" + "estadia=" + estadia + ", extra=" + extra + '}';
     }
+
     
-    
+   
 }

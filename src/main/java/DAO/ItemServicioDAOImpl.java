@@ -32,22 +32,19 @@ public class ItemServicioDAOImpl implements IItemServicioDAO{
         ItemFactura item = null;
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
-            stmt = conn.prepareStatement("SELECT * FROM itemservicio AS is, itemfactura AS if WHERE is.idItemFactura = ? AND is.idItemFactura = if.idItemFactura");
+            stmt = conn.prepareStatement("SELECT * FROM itemservicio AS its, itemfactura AS it WHERE its.idItemFactura = ? AND its.idItemFactura = it.idItemFactura");
             stmt.setInt(1, idItem);
             rs = stmt.executeQuery();
             
             while(rs.next()){
                 //Obtenemos el servicio al que hace referencia
                 Servicio servicio = new ServicioDAOImpl(conn).obtenerServicio(rs.getInt("idServicio"));
-                
-                item = new ItemServicio(rs.getInt("cantidad"), rs.getFloat("precioUnitario"), servicio, idItem, rs.getString("descripcion"), rs.getFloat("precioitem"));
+               
+                item = new ItemServicio(servicio, idItem, rs.getString("descripcion"), rs.getFloat("precioItem"), rs.getFloat("precioUnitario"),rs.getInt("cantidad"));
             }
-           
-            
         }finally{
             try {
                 close(stmt);
-                close(rs);
                 if(this.conexionTransaccional == null){
                     close(conn);
                 }

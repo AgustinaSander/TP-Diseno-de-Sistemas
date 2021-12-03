@@ -8,10 +8,13 @@ import Dominio.DTO.ReservaDTO;
 import Dominio.DTO.TipoDeHabitacionDTO;
 import static Gestores.GestorHabitaciones.getInstanceHabitaciones;
 import static Gestores.GestorReservas.getInstanceReservas;
+import static Validaciones.Validaciones.obtenerFechasIntermedias;
 import java.awt.BorderLayout;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,6 +30,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
     private JComboBox tipoHab;
     private Date desde;
     private Date hasta;
+    private List <TipoDeHabitacionDTO> tipoDeHabitaciones;
     private List<HabitacionDTO> listaHabitaciones;
     
     public MostrarEstadoHabitaciones(java.awt.Frame parent, boolean modal, Date fechaDesde, Date fechaHasta, String titulo, String tipoHabitacionSeleccionado) {
@@ -36,8 +40,9 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         this.hasta = fechaHasta;
         
         //Obtenemos los tipos de habitaciones disponibles
-        List <TipoDeHabitacionDTO> tipoDeHabitaciones = getInstanceHabitaciones().obtenerTiposDeHabitaciones();
-
+        List <TipoDeHabitacionDTO> tipoDeHab = getInstanceHabitaciones().obtenerTiposDeHabitaciones();
+        tipoDeHabitaciones = tipoDeHab;
+        
         JComboBox tipoHabCombo = new JComboBox();
         this.tipoHab = tipoHabCombo;
         tipoHabCombo.setBounds(40,60,800,20);
@@ -87,7 +92,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         this.listaHabitaciones = habitaciones;
         
         //Obtengo un arreglo con todas las fechas intermedias del intervalo
-        List<Date> listaFechas = getInstanceHabitaciones().obtenerFechasIntermedias(desde, hasta);
+        List<String> listaFechas = obtenerFechasIntermedias(desde, hasta);
         
         //Creo la tabla
         String [] nombreColumnas = new String[habitaciones.size()+1];
@@ -103,8 +108,12 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
             List<String> estados = new ArrayList<>();
             
             for(int col = 1; col <= habitaciones.size(); col++){
-                //Completo los datos de la tabla
-                datos[row][col] = obtenerEstado(listaFechas.get(row), habitaciones.get(col-1), listaEstados.get(habitaciones.get(col-1).getId()));
+                try {
+                    //Completo los datos de la tabla
+                    datos[row][col] = obtenerEstado(new SimpleDateFormat("dd-MM-yyyy").parse(listaFechas.get(row)), habitaciones.get(col-1), listaEstados.get(habitaciones.get(col-1).getId()));
+                } catch (ParseException ex) {
+                    ex.printStackTrace(System.out);
+                }
             }
         }
         
@@ -126,7 +135,7 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
         table.setColumnSelectionAllowed(false);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setCellSelectionEnabled(true);
-       
+        
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBounds(40,100,800,350);
         this.setLayout(null);
@@ -333,10 +342,20 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
                         
                         DefaultTableModel dtm = (DefaultTableModel) tabla.getModel();
                         int idHab = listaHabitaciones.get(columnaSeleccionada-1).getId();
+                        
                         Date fechaDesde = new SimpleDateFormat("dd-MM-yyyy").parse( dtm.getValueAt(filasSeleccionadas[0], 0).toString() );
                         Date fechaHasta = new SimpleDateFormat("dd-MM-yyyy").parse( dtm.getValueAt(filasSeleccionadas[filasSeleccionadas.length - 1], 0).toString() );
                         
-                        new BusquedaPasajerosOcupantes(null, true, new EstadiaDTO(idHab, fechaDesde, fechaHasta)).setVisible(true);
+                        //Busco la capacidad del tipo de habitacion seleccionada
+                        int capacidad = 0;
+                        for(TipoDeHabitacionDTO tipo : tipoDeHabitaciones){
+                            if(tipo.getNombre() == tipoHab.getSelectedItem()){
+                                capacidad = tipo.getCapacidad();
+                                break;
+                            }
+                        }
+                        
+                        new BusquedaPasajerosOcupantes(null, true, new EstadiaDTO(0, idHab, fechaDesde, fechaHasta, null, capacidad)).setVisible(true);
                         
                     }
                 }
@@ -346,11 +365,22 @@ public class MostrarEstadoHabitaciones extends javax.swing.JDialog {
 
                     DefaultTableModel dtm = (DefaultTableModel) tabla.getModel();
                     int idHab = listaHabitaciones.get(columnaSeleccionada-1).getId();
+                   
                     Date fechaDesde = new SimpleDateFormat("dd-MM-yyyy").parse( dtm.getValueAt(filasSeleccionadas[0], 0).toString() );
                     Date fechaHasta = new SimpleDateFormat("dd-MM-yyyy").parse( dtm.getValueAt(filasSeleccionadas[filasSeleccionadas.length - 1], 0).toString() );
                     this.dispose();
+                    
+                    //Busco la capacidad del tipo de habitacion seleccionada
+                    int capacidad = 0;
+                    for(TipoDeHabitacionDTO tipo : tipoDeHabitaciones){
+                            if(tipo.getNombre() == tipoHab.getSelectedItem()){
+                                capacidad = tipo.getCapacidad();
+                                break;
+                            }
+                    }
+                    
                     //La habitacion esta desocupada en ese rango de fechas
-                    new BusquedaPasajerosOcupantes(null, true, new EstadiaDTO(idHab, fechaDesde, fechaHasta)).setVisible(true);
+                    new BusquedaPasajerosOcupantes(null, true, new EstadiaDTO(0, idHab, fechaDesde, fechaHasta, null, capacidad)).setVisible(true);
                 }
             } catch (ParseException ex) {
                 ex.printStackTrace(System.out);

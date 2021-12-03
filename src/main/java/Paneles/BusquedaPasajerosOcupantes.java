@@ -25,7 +25,6 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
         this.setLocationRelativeTo(null);
         this.setTitle("Busqueda de Pasajeros Ocupantes");
         this.estadia = estadiaDTO;
-        
         //Cargo los valores del Tipo de Documento
         tipoDocCombo.removeAllItems();
         tipoDocCombo.addItem("Seleccionar");
@@ -276,7 +275,10 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
             //Si no se selecciono ningun pasajero
             JOptionPane.showMessageDialog(this, "Seleccione al menos un pasajero.", "Realice una seleccion",JOptionPane.ERROR_MESSAGE);
         }
-        else{
+        else if(resultadosTabla.getSelectedRowCount() > estadia.getCapacidad()){
+            //Si supera la capacidad de la habitacion
+            JOptionPane.showMessageDialog(this, "La capacidad maxima del tipo de habitacion seleccionada es de "+estadia.getCapacidad()+".", "Capacidad de la habitacion insuficiente",JOptionPane.ERROR_MESSAGE);
+        }else{
             //Si se selecciono al menos uno
             //Tengo que ver si seleccionaron solo UN responsable de habitacion
             int filaResponsable = -1;
@@ -334,7 +336,6 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
                             case JOptionPane.OK_OPTION: //Se vuelve a mostrar la interfaz de busqueda de pasajeros para seguir agregando
                                                         break;
                             case JOptionPane.NO_OPTION: //Se guarda la estadia y se vuelve a la interfaz de SeleccionFechasEstadoHabitacion
-                                                        System.out.println("Cargar otra habitacion");
                                                         idEstadia = getInstanceEstadias().crearEstadia(pasajerosSeleccionados, estadia);
                                                         if(idEstadia != 0 ){
                                                             //Se creo exitosamente la estadia
@@ -348,7 +349,7 @@ public class BusquedaPasajerosOcupantes extends javax.swing.JDialog {
                                                         }
                                                         break;
                             case JOptionPane.CANCEL_OPTION: //Se guarda la estadia y se vuelve a la interfaz principal
-                                                            System.out.println("Salir");
+                                                            
                                                             idEstadia = getInstanceEstadias().crearEstadia(pasajerosSeleccionados, estadia);
                                                             if(idEstadia != 0 ){
                                                                 //Se creo exitosamente la estadia

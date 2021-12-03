@@ -4,7 +4,9 @@ package DAO;
 import static Conexion.Conexion.close;
 import static Conexion.Conexion.getConnection;
 import Dominio.Factura;
+import Dominio.ItemEstadia;
 import Dominio.ItemFactura;
+import Dominio.ItemServicio;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -59,4 +61,62 @@ public class ItemFacturaDAOImpl implements IItemFacturaDAO{
         }
         return itemsFactura; 
     }
+    
+    @Override
+    public void crearItemsFactura(List<ItemFactura> listaItemsFactura, int idFactura) throws SQLException{
+        try {
+            conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
+            
+            for(ItemFactura i: listaItemsFactura){
+                stmt = conn.prepareStatement("INSERT INTO `itemfactura`(`idFactura`, `descripcion`, `precioItem`, `precioUnitario`, `cantidad`) VALUES (?,?,?,?,?)");
+                stmt.setInt(1,idFactura);
+                stmt.setString(2,i.getDescripcion());
+                stmt.setFloat(3, i.getPrecioItem());
+                stmt.setFloat(4, i.getPrecioUnitario());
+                stmt.setInt(5, i.getCantidad());
+                stmt.executeUpdate();
+                
+                //Recupero el idItemFactura generado por la base
+                int idItemFactura = 0;
+                stmt = conn.prepareStatement("SELECT MAX(idItemFactura) FROM `itemfactura`;");
+                rs = stmt.executeQuery();
+                if(rs.next()){
+                    idItemFactura = rs.getInt("MAX(idItemFactura)");
+                }
+                
+                //Creo el objeto itemEstadia o itemServicio
+                if(i instanceof ItemEstadia){
+                    //Si es itemEstadia
+                    stmt = conn.prepareStatement("INSERT INTO `itemestadia`(`idItemFactura`, `idEstadia`, `extra`) VALUES (?, ?, ?)");
+                    stmt.setInt(1,idItemFactura);
+                    stmt.setInt(2, ((ItemEstadia) i).getEstadia().getIdEstadia());
+                    stmt.setBoolean(3, ((ItemEstadia) i).getExtra());
+                    
+                    stmt.executeUpdate();
+                }
+                else{
+                    //Si es itemServicio
+                    stmt = conn.prepareStatement("INSERT INTO `itemservicio`(`idItemFactura`, `idServicio`) VALUES (?,?)");
+                    stmt.setInt(1,idItemFactura);
+                    stmt.setInt(2, ((ItemServicio) i).getServicio().getIdServicio());
+                    
+                    stmt.executeUpdate();
+                }
+                
+            }
+            
+        }finally{
+            try {
+                close(stmt);
+                close(rs);
+                if(this.conexionTransaccional == null){
+                    close(conn);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace(System.out);
+            }
+        }    
+    }
+    
+    
 }

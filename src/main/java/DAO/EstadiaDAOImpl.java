@@ -149,7 +149,6 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
         } finally{
             try {
                 close(stmt);
-                close(rs);
                 close(conn);
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);
@@ -280,10 +279,11 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
 
     public Estadia obtenerEstadia(int idEstadia) throws SQLException{
         Estadia estadia = null;
+       
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
-            stmt = conn.prepareStatement("SELECT * FROM estadia WHERE idEstadia = ?");
+            stmt = conn.prepareStatement("SELECT * FROM estadia WHERE id = ?");
             stmt.setInt(1, idEstadia);
             rs = stmt.executeQuery();
             
@@ -304,9 +304,8 @@ public class EstadiaDAOImpl implements IEstadiaDAO{
         }finally{
             try {
                 if(this.conexionTransaccional == null){
-                    close(stmt);
                     close(rs);
-                    
+                    close(stmt);                    
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace(System.out);

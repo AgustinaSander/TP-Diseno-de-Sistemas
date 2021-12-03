@@ -2,42 +2,18 @@
 package Dominio;
 
 public class ItemServicio extends ItemFactura{
-    private int cantidad;
-    private float precioUnitario;
     private Servicio servicio;
 
     public ItemServicio() {
     }
 
-    public ItemServicio(int cantidad, float precioUnitario, Servicio servicio) {
-        this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
+    public ItemServicio(Servicio servicio) {
         this.servicio = servicio;
     }
 
-    public ItemServicio(int cantidad, float precioUnitario, Servicio servicio, int idItemFactura, String descripcion, float precioItem) {
-        super(idItemFactura, descripcion, precioItem);
-        this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
+    public ItemServicio(Servicio servicio, int idItemFactura, String descripcion, float precioItem, float precioUnitario, int cantidad) {
+        super(idItemFactura, descripcion, precioItem, precioUnitario, cantidad);
         this.servicio = servicio;
-    }
-
-   
-
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public float getPrecioUnitario() {
-        return precioUnitario;
-    }
-
-    public void setPrecioUnitario(float precioUnitario) {
-        this.precioUnitario = precioUnitario;
     }
 
     public Servicio getServicio() {
@@ -48,10 +24,49 @@ public class ItemServicio extends ItemFactura{
         this.servicio = servicio;
     }
 
+    public int getIdItemFactura() {
+        return idItemFactura;
+    }
+
+    public void setIdItemFactura(int idItemFactura) {
+        this.idItemFactura = idItemFactura;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public float getPrecioItem() {
+        return precioItem;
+    }
+
+    public void setPrecioItem(float precioItem) {
+        this.precioItem = precioItem;
+    }
+
+    public float getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(float precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
     @Override
     public String toString() {
-        return "ItemServicio{" + "cantidad=" + cantidad + ", precioUnitario=" + precioUnitario + ", servicio=" + servicio + '}';
+        return "ItemServicio{" + "servicio=" + servicio + '}';
     }
-    
-    
+
 }

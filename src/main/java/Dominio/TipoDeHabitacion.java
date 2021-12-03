@@ -7,6 +7,7 @@ public class TipoDeHabitacion {
     private int idTipoHabitacion;
     private String nombre;
     private Float precio;
+    private int capacidad;
     private List<Habitacion> listaHabitaciones;
     
     public TipoDeHabitacion() {
@@ -16,16 +17,18 @@ public class TipoDeHabitacion {
         this.idTipoHabitacion = idTipoHabitacion;
     }
 
-    public TipoDeHabitacion(int idTipoHabitacion, String nombre, Float precio) {
+    public TipoDeHabitacion(int idTipoHabitacion, String nombre, Float precio, int capacidad) {
         this.idTipoHabitacion = idTipoHabitacion;
         this.nombre = nombre;
+        this.capacidad = capacidad;
         this.precio = precio;
     }
 
-    public TipoDeHabitacion(int idTipoHabitacion, String nombre, Float precio, List<Habitacion> listaHabitaciones) {
+    public TipoDeHabitacion(int idTipoHabitacion, String nombre, Float precio, int capacidad, List<Habitacion> listaHabitaciones) {
         this.idTipoHabitacion = idTipoHabitacion;
         this.nombre = nombre;
         this.precio = precio;
+        this.capacidad = capacidad;
         this.listaHabitaciones = listaHabitaciones;
     }
 
@@ -53,6 +56,14 @@ public class TipoDeHabitacion {
         this.precio = precio;
     }
 
+    public int getCapacidad() {
+        return capacidad;
+    }
+
+    public void setCapacidad(int capacidad) {
+        this.capacidad = capacidad;
+    }
+
     public List<Habitacion> getListaHabitaciones() {
         return listaHabitaciones;
     }
@@ -63,8 +74,7 @@ public class TipoDeHabitacion {
 
     @Override
     public String toString() {
-        return "TipoDeHabitacion{" + "idTipoHabitacion=" + idTipoHabitacion + ", nombre=" + nombre + ", precio=" + precio + ", listaHabitaciones=" + listaHabitaciones + '}';
+        return "TipoDeHabitacion{" + "idTipoHabitacion=" + idTipoHabitacion + ", nombre=" + nombre + ", precio=" + precio + ", capacidad=" + capacidad + ", listaHabitaciones=" + listaHabitaciones + '}';
     }
 
- 
 }

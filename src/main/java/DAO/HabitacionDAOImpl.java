@@ -32,11 +32,11 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
         try {
             conn = this.conexionTransaccional != null ? this.conexionTransaccional : getConnection();
             
-            stmt = conn.prepareStatement("SELECT h.id AS idHabitacion, h.nro, h.idTipoHabitacion, h.precio AS precioHabitacion, t.* FROM habitacion AS h, tipodehabitacion AS t WHERE h.id = ? AND h.idTipoHabitacion = t.id");
+            stmt = conn.prepareStatement("SELECT h.id AS idHabitacion, h.nro, h.idTipoHabitacion, t.* FROM habitacion AS h, tipodehabitacion AS t WHERE h.id = ? AND h.idTipoHabitacion = t.id");
             stmt.setInt(1,idHabitacion);
             rs = stmt.executeQuery();
             while(rs.next()){
-                hab = new Habitacion(rs.getInt("idHabitacion"),rs.getString("nro"), rs.getFloat("precioHabitacion"));
+                hab = new Habitacion(rs.getInt("idHabitacion"),rs.getString("nro"));
             }
             
         }finally{
@@ -64,7 +64,7 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
             stmt.setString(1, nroHabitacion);
             rs = stmt.executeQuery();
             while(rs.next()){
-                habitacion = new Habitacion(rs.getInt("id"), rs.getString("nro"), rs.getFloat("precio"));
+                habitacion = new Habitacion(rs.getInt("id"), rs.getString("nro"));
             }
             
         }finally{
@@ -90,7 +90,7 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
             stmt = conn.prepareStatement("SELECT * FROM `habitacion`");
             rs = stmt.executeQuery();
             while(rs.next()){
-                habitaciones.add(new Habitacion(rs.getInt("id"), rs.getString("nro"), rs.getFloat("precio")));
+                habitaciones.add(new Habitacion(rs.getInt("id"), rs.getString("nro")));
             }
             
         }finally{
@@ -118,7 +118,7 @@ public class HabitacionDAOImpl implements IHabitacionDAO{
             stmt.setInt(1,idTipo);
             rs = stmt.executeQuery();
             while(rs.next()){
-                habitaciones.add(new Habitacion(rs.getInt("id"), rs.getString("nro"), rs.getFloat("precio")));
+                habitaciones.add(new Habitacion(rs.getInt("id"), rs.getString("nro")));
             }
             
         }finally{

@@ -3,6 +3,7 @@ package Paneles;
 
 import Dominio.DTO.EstadiaDTO;
 import Dominio.DTO.PasajeroDTO;
+import Dominio.DTO.PersonaDTO;
 import static Gestores.GestorEstadias.getInstanceEstadias;
 import Validaciones.BusquedaFacturacion;
 import static Validaciones.Validaciones.calcularEdad;
@@ -16,7 +17,7 @@ public class ElegirResponsableDePago extends javax.swing.JDialog {
 
     int idUltimaEstadia = 0;
     EstadiaDTO ultimaEstadia = null;
-    PasajeroDTO responsable = null;
+    PersonaDTO responsable = null;
     String hora = null;
     List<PasajeroDTO> listaOcupantes = null;
     
@@ -209,7 +210,10 @@ public class ElegirResponsableDePago extends javax.swing.JDialog {
         else{
             int edadResponsable = calcularEdad(listaOcupantes.get(filaResponsable).getFechaNac());
             if(edadResponsable >= 18){
-                responsable = listaOcupantes.get(filaResponsable);
+                PasajeroDTO r = listaOcupantes.get(filaResponsable);
+               
+                PersonaDTO responsableSeleccionado = new PersonaDTO(true, r.getApellido(), r.getNombre(), r.getTipoDoc(), r.getNumDoc(), r.getFechaNac(), r.getEmail(), r.getOcupacion(), r.getNacionalidad(), r.getCUIT(), r.getPosIva(), r.getTelefono(), r.getPais(), r.getProvincia(), r.getLocalidad(), r.getCalle(), r.getNumero(), r.getDepartamento(), r.getCodigoPostal(), r.getIdPersona(), r.getIdDireccion());
+                responsable = responsableSeleccionado;
                 //Se muestra la interfaz Facturacion
                 new Facturacion(null, true, ultimaEstadia, responsable, hora).setVisible(true);
             }
@@ -219,9 +223,6 @@ public class ElegirResponsableDePago extends javax.swing.JDialog {
 
             }
         }
-        
-        
-        
     }//GEN-LAST:event_aceptarBtnActionPerformed
 
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
@@ -273,7 +274,7 @@ public class ElegirResponsableDePago extends javax.swing.JDialog {
             ultimaEstadia = getInstanceEstadias().obtenerUltimaEstadia(nroHabField.getText());
             listaOcupantes = ultimaEstadia.getListaPasajeros();
             
-            //System.out.println(ultimaEstadia);
+
             
             DefaultTableModel tabla = (DefaultTableModel) tablaOcupantes.getModel();
             tabla.setRowCount(0);

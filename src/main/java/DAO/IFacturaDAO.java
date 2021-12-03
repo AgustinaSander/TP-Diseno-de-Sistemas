@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface IFacturaDAO {
     public List<Factura> obtenerFacturasEstadia(int idEstadia) throws SQLException;
+    public int crearFactura(Factura factura) throws SQLException;
 }

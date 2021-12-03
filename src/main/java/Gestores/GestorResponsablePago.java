@@ -3,9 +3,12 @@ package Gestores;
 
 import DAO.IResponsableDAO;
 import DAO.ResponsableDAOImpl;
-import Dominio.DTO.ResponsableDTO;
+import Dominio.DTO.PersonaDTO;
 import Dominio.ResponsableDePago;
 import static Validaciones.Validaciones.verificarCUIT;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GestorResponsablePago {
     private static GestorResponsablePago instanciaGResponsable = null;
@@ -24,14 +27,22 @@ public class GestorResponsablePago {
         return verificarCUIT(cuit);
     }
     
-    public ResponsableDTO obtenerResponsableDePago(String cuit){
+    public PersonaDTO obtenerResponsableDePago(String cuit){
         responsableDAO = new ResponsableDAOImpl();
-        ResponsableDePago responsable = responsableDAO.obtenerResponsableDePago(cuit);
-        System.out.println(responsable);
-        //String razonSocial, int idPersona, String CUIT, PosicionIVA posIva, String telefono, Direccion direccion
-        ResponsableDTO responsableDTO = new ResponsableDTO(responsable.getRazonSocial(), responsable.getIdPersona(), responsable.getCUIT(),responsable.getPosIva(), responsable.getTelefono(), responsable.getDireccion());
-                
-       return responsableDTO;
+        ResponsableDePago responsable = null;
+        try {
+            responsable = responsableDAO.obtenerResponsableDePago(cuit);
+        } catch (SQLException ex) {
+            Logger.getLogger(GestorResponsablePago.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        if(responsable != null){
+            PersonaDTO responsableDTO = new PersonaDTO(false, responsable.getCUIT(), responsable.getPosIva(), responsable.getTelefono(), responsable.getRazonSocial(), responsable.getIdPersona(), responsable.getDireccion().getIdDireccion());
+            return responsableDTO;
+        }     
+        else{
+            return null;
+        }
     }
     
 }

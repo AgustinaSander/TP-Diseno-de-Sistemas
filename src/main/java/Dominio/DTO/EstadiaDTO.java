@@ -10,14 +10,15 @@ public class EstadiaDTO {
     private Date fechaDesde;
     private Date fechaHasta;
     private Float precio;
+    private int capacidad;
     private List<PasajeroDTO> listaPasajeros;
     private List<ServicioDTO> listaServicios;
     
     public EstadiaDTO() {
     }
 
-    public EstadiaDTO(int idEstadia, Date fechaDesde, Date fechaHasta) {
-        this.idEstadia = idEstadia;
+    public EstadiaDTO(int idHabitacion, Date fechaDesde, Date fechaHasta, int capacidad) {
+        this.idHabitacion = idHabitacion;
         this.fechaDesde = fechaDesde;
         this.fechaHasta = fechaHasta;
     }
@@ -27,6 +28,15 @@ public class EstadiaDTO {
         this.idHabitacion = idHabitacion;
         this.fechaDesde = fechaDesde;
         this.fechaHasta = fechaHasta;
+        this.precio = precio;
+    }
+
+    public EstadiaDTO(int idEstadia, int idHabitacion, Date fechaDesde, Date fechaHasta, Float precio, int capacidad) {
+        this.idEstadia = idEstadia;
+        this.idHabitacion = idHabitacion;
+        this.fechaDesde = fechaDesde;
+        this.fechaHasta = fechaHasta;
+        this.capacidad = capacidad;
         this.precio = precio;
     }
 
@@ -78,11 +88,27 @@ public class EstadiaDTO {
         this.listaPasajeros = listaPasajeros;
     }
 
-    @Override
-    public String toString() {
-        return "EstadiaDTO{" + "idEstadia=" + idEstadia + ", idHabitacion=" + idHabitacion + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + ", precio=" + precio + ", listaPasajeros=" + listaPasajeros + '}';
+    public int getCapacidad() {
+        return capacidad;
     }
 
+    public void setCapacidad(int capacidad) {
+        this.capacidad = capacidad;
+    }
 
+    public List<ServicioDTO> getListaServicios() {
+        return listaServicios;
+    }
+
+    public void setListaServicios(List<ServicioDTO> listaServicios) {
+        this.listaServicios = listaServicios;
+    }
+
+    @Override
+    public String toString() {
+        return "EstadiaDTO{" + "idEstadia=" + idEstadia + ", idHabitacion=" + idHabitacion + ", fechaDesde=" + fechaDesde + ", fechaHasta=" + fechaHasta + ", precio=" + precio + ", capacidad=" + capacidad + ", listaPasajeros=" + listaPasajeros + ", listaServicios=" + listaServicios + '}';
+    }
+
+    
     
 }
