@@ -30,6 +30,8 @@ public class GestionarPasajero extends javax.swing.JDialog {
             tipoDocCombo.addItem(tipoDoc.name());
         }
         tipoDocCombo.setSelectedItem("Seleccionar");
+        
+        resultadosTabla.getTableHeader().setReorderingAllowed(false);
     }
 
     @SuppressWarnings("unchecked")

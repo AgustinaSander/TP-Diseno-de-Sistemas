@@ -46,6 +46,7 @@ public class FacturaDAOImpl implements IFacturaDAO{
           
             while(rs.next()){
                 //Por cada factura, obtengo sus items en el ItemFacturaDAO
+                //Por cada factura, obtengo 
                 if(rs.getString("tipoFactura") == "A"){
                     //Creo factura de tipo A
                     factura = new FacturaA(rs.getFloat("montoIVA"), rs.getInt("idFactura"), rs.getDate("fecha"), rs.getFloat("importeNeto"), rs.getFloat("importeTotal"), rs.getBoolean("pagada"));

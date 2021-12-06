@@ -14,6 +14,7 @@ public abstract class Factura {
     protected NotaDeCredito notaCredito;
     protected List<ItemFactura> listaItemsFactura;
     protected Estadia estadia;
+    protected List<Pago> listaPagos;
 
     public Factura() {
     }
@@ -47,6 +48,20 @@ public abstract class Factura {
         this.listaItemsFactura = listaItemsFactura;
         this.estadia = estadia;
     }
+
+    public Factura(int idFactura, Date fecha, float importeNeto, float importeTotal, Boolean pagada, Persona persona, NotaDeCredito notaCredito, List<ItemFactura> listaItemsFactura, Estadia estadia, List<Pago> listaPagos) {
+        this.idFactura = idFactura;
+        this.fecha = fecha;
+        this.importeNeto = importeNeto;
+        this.importeTotal = importeTotal;
+        this.pagada = pagada;
+        this.persona = persona;
+        this.notaCredito = notaCredito;
+        this.listaItemsFactura = listaItemsFactura;
+        this.estadia = estadia;
+        this.listaPagos = listaPagos;
+    }
+    
     
     public int getIdFactura() {
         return idFactura;

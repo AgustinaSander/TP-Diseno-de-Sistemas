@@ -19,6 +19,8 @@ public class Facturacion extends javax.swing.JDialog {
     private Double montoServicio;
     private Double montoEstadia;
     private PersonaDTO pasajero;
+    private EstadiaDTO estadia;
+    private String hora;
     private int idEstadia;
     private List<ItemDTO> itemsEstadia;
     private List<ItemDTO> itemsServicio;
@@ -28,85 +30,92 @@ public class Facturacion extends javax.swing.JDialog {
         
         List<ItemDTO> itemsAFacturar = getInstanceEstadias().obtenerItemsAFacturar(estadia.getIdEstadia(), hora);
         //Si no quedan items por facturar
+        
         if(itemsAFacturar.size() == 0){
             JOptionPane.showMessageDialog(this, "No quedan items por facturar", "Items facturados",JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-        }
-        
-        initComponents();
-        this.setTitle("Facturacion");
-        this.setLocationRelativeTo(null);
-        this.montoTotal = 0.0;
-        this.montoServicio = 0.0;
-        this.montoEstadia = 0.0;
-        this.pasajero = pasajero;
-        this.idEstadia = estadia.getIdEstadia();
-        
-        if(pasajero.getEsPasajero()){
-            responsableField.setText(pasajero.getNombre() + " " + pasajero.getApellido());
+            
         }
         else{
-            responsableField.setText(pasajero.getRazonSocial());
-        }
-        
-       
-        
-        //Lista donde voy a guardar solo los items estadia
-        List<ItemDTO> itemsEstadia = new ArrayList<>();
-        
-        //Lista donde voy a guardar solo los items servicio
-        List<ItemDTO> itemsServicio = new ArrayList<>();
-        
-        DefaultTableModel tablaServicio = (DefaultTableModel) tablaServicios.getModel();
-        tablaServicio.setRowCount(0);
-        DefaultTableModel tablaEstadias = (DefaultTableModel) tablaEstadia.getModel();
-        tablaEstadias.setRowCount(0);
-        
-        for(ItemDTO i : itemsAFacturar){
-            if(i.getEsItemServicio()){
-                //Recupero los servicios de esa estadia
-                itemsServicio.add(i);
-                tablaServicio.addRow(new Object[]{i.getFecha(), i.getDescripcion(), i.getCantidad(), i.getMonto()});
+            initComponents();
+            
+            this.setTitle("Facturacion");
+            this.setLocationRelativeTo(null);
+            this.montoTotal = 0.0;
+            this.montoServicio = 0.0;
+            this.montoEstadia = 0.0;
+            this.pasajero = pasajero;
+            this.idEstadia = estadia.getIdEstadia();
+            this.estadia = estadia;
+            this.pasajero = pasajero;
+            this.hora = hora;
+
+            if(pasajero.getEsPasajero()){
+                responsableField.setText(pasajero.getNombre() + " " + pasajero.getApellido());
             }
             else{
-                //Recupero las estadias
-                itemsEstadia.add(i);
-                tablaEstadias.addRow(new Object[]{i.getDescripcion(), i.getCantidad(), i.getMonto()});
+                responsableField.setText(pasajero.getRazonSocial());
             }
-        }
-      
-        this.itemsEstadia = itemsEstadia;
-        this.itemsServicio = itemsServicio;
 
-        tablaServicios.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            //Lista donde voy a guardar solo los items estadia
+            List<ItemDTO> itemsEstadia = new ArrayList<>();
+
+            //Lista donde voy a guardar solo los items servicio
+            List<ItemDTO> itemsServicio = new ArrayList<>();
+
+            DefaultTableModel tablaServicio = (DefaultTableModel) tablaServicios.getModel();
+            tablaServicio.setRowCount(0);
+            DefaultTableModel tablaEstadias = (DefaultTableModel) tablaEstadia.getModel();
+            tablaEstadias.setRowCount(0);
+
+            for(ItemDTO i : itemsAFacturar){
+                if(i.getEsItemServicio()){
+                    //Recupero los servicios de esa estadia
+                    itemsServicio.add(i);
+                    tablaServicio.addRow(new Object[]{i.getFecha(), i.getDescripcion(), i.getCantidad(), i.getMonto()});
+                }
+                else{
+                    //Recupero las estadias
+                    itemsEstadia.add(i);
+                    tablaEstadias.addRow(new Object[]{i.getDescripcion(), i.getCantidad(), i.getMonto()});
+                }
+            }
+
+            this.itemsEstadia = itemsEstadia;
+            this.itemsServicio = itemsServicio;
+
+            tablaServicios.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+                public void valueChanged(ListSelectionEvent lse) {
+                    if (!lse.getValueIsAdjusting()) {
+                        montoServicio = 0.0;
+                        //Obtengo las filas seleccionadas y los montos de las mismas
+                        int [] filasSeleccionadas = tablaServicios.getSelectedRows();
+                        for(int i=0; i< filasSeleccionadas.length; i++){
+                            montoServicio += ((Number) tablaServicios.getValueAt(filasSeleccionadas[i], 3)).doubleValue() * (Integer)tablaServicios.getValueAt(filasSeleccionadas[i], 2);
+                        }
+                        actualizarMonto();
+                    }
+                }
+            });
+
+            tablaEstadia.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+                public void valueChanged(ListSelectionEvent lse) {
+                    if (!lse.getValueIsAdjusting()) {
+                        montoEstadia = 0.0;
+                        //Obtengo las filas seleccionadas y los montos de las mismas
+                        int [] filasSeleccionadas = tablaEstadia.getSelectedRows();
+                        for(int i=0; i< filasSeleccionadas.length; i++){
+                            montoEstadia += ((Number) tablaEstadia.getValueAt(filasSeleccionadas[i], 2)).doubleValue();
+                        }
+                        actualizarMonto();
+                    }
+                }
+            });   
+        }   
             
-            public void valueChanged(ListSelectionEvent lse) {
-                if (!lse.getValueIsAdjusting()) {
-                    montoServicio = 0.0;
-                    //Obtengo las filas seleccionadas y los montos de las mismas
-                    int [] filasSeleccionadas = tablaServicios.getSelectedRows();
-                    for(int i=0; i< filasSeleccionadas.length; i++){
-                        montoServicio += ((Number) tablaServicios.getValueAt(filasSeleccionadas[i], 3)).doubleValue() * (Integer)tablaServicios.getValueAt(filasSeleccionadas[i], 2);
-                    }
-                    actualizarMonto();
-                }
-            }
-        });
         
-        tablaEstadia.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            public void valueChanged(ListSelectionEvent lse) {
-                if (!lse.getValueIsAdjusting()) {
-                    montoEstadia = 0.0;
-                    //Obtengo las filas seleccionadas y los montos de las mismas
-                    int [] filasSeleccionadas = tablaEstadia.getSelectedRows();
-                    for(int i=0; i< filasSeleccionadas.length; i++){
-                        montoEstadia += ((Number) tablaEstadia.getValueAt(filasSeleccionadas[i], 2)).doubleValue();
-                    }
-                    actualizarMonto();
-                }
-            }
-        });    
     }
 
     @SuppressWarnings("unchecked")
@@ -284,6 +293,7 @@ public class Facturacion extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
     public void actualizarMonto(){
         Double montoTotal = montoServicio + montoEstadia;
         montoField.setText(montoTotal.toString());
@@ -307,20 +317,23 @@ public class Facturacion extends javax.swing.JDialog {
             List<ItemDTO> itemsServicioSeleccionados = new ArrayList<>();
             
             //Obtengo los item estadia seleccionados
-            int [] filasSeleccionadas = tablaEstadia.getSelectedRows();
-            for(int i=0; i < filasSeleccionadas.length; i++){
-                itemsEstadiaSeleccionados.add(itemsEstadia.get(filasSeleccionadas[i]));
+            int [] filasEstadiaSeleccionadas = tablaEstadia.getSelectedRows();
+            for(int i=0; i < filasEstadiaSeleccionadas.length; i++){
+                itemsEstadiaSeleccionados.add(itemsEstadia.get(filasEstadiaSeleccionadas[i]));
             }
             
             //Obtengo los item servicio seleccionados
-            filasSeleccionadas = tablaServicios.getSelectedRows();
-            for(int i=0; i < filasSeleccionadas.length ; i++){
-                itemsServicioSeleccionados.add(itemsServicio.get(filasSeleccionadas[i]));
+            int [] filasServicioSeleccionadas = tablaServicios.getSelectedRows();
+            for(int i=0; i < filasServicioSeleccionadas.length ; i++){
+                itemsServicioSeleccionados.add(itemsServicio.get(filasServicioSeleccionadas[i]));
             }
 
             int idFactura = getInstanceFacturas().crearFactura(itemsEstadiaSeleccionados, itemsServicioSeleccionados, pasajero , idEstadia);
             if(idFactura > 0){
                 JOptionPane.showMessageDialog(this, "Factura generada correctamente.", "Factura exitosa",JOptionPane.INFORMATION_MESSAGE);
+                //Cerramos la interfaz y volvemos a abrirla
+                this.dispose();
+                new Facturacion(null, true, estadia, pasajero, hora).setVisible(true);
             }
             else{
                 JOptionPane.showMessageDialog(this, "Error al generar la factura.", "Factura no generada",JOptionPane.ERROR_MESSAGE);

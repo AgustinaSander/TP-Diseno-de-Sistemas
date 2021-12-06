@@ -38,7 +38,10 @@ public class ResponsableDAOImpl implements IResponsableDAO{
             
             
             while(rs.next()){
-                Direccion direccion = new Direccion (rs.getInt("idDireccion"));
+               
+                //Obtengo el objeto direccion
+                Direccion direccion = new DireccionDAOImpl(conn).obtenerDireccionPasajero(rs.getInt("idPersona"));
+                                
                 responsable = new ResponsableDePago(rs.getString("razonSocial"), rs.getInt("idPersona"), rs.getString("CUIT"), PosicionIVA.valueOf(rs.getString("posIVA")), rs.getString("telefono"),direccion);
             }
             
