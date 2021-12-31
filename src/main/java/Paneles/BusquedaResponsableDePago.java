@@ -29,28 +29,8 @@ public class BusquedaResponsableDePago extends javax.swing.JDialog {
             public void focusLost(FocusEvent e) {
                 //Cuando se pierde el foco se valida lo ingresado
                 //Se valida el cuit
-                if(cuitField.getText().length() != 0){
-                    Boolean cuitValido = getInstanceResponsable().validarCUIT(cuitField.getText());
-                    if(cuitValido){
-                        cuitField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                        //Se busca la razon social
-                        responsable = getInstanceResponsable().obtenerResponsableDePago(cuitField.getText());
-                        if(responsable != null){
-                            razonSocialField.setText(responsable.getRazonSocial());
-                        }
-                        else{
-                            cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
-                            razonSocialField.setText("");
-                        }
-                    }
-                    else{
-                        cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
-                        razonSocialField.setText("");
-                    }
-                }
-                else{
-                    cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
-                    razonSocialField.setText("");
+                if(validarFormatoCuit()){
+                    validarExistenciaCuit();
                 }
             }
 
@@ -160,10 +140,15 @@ public class BusquedaResponsableDePago extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void aceptarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarBtnActionPerformed
+
         if(cuitField.getText().length() == 0){
             JOptionPane.showMessageDialog(this, "Funcionalidad Dar Alta Responsable de Pago no disponible", null,JOptionPane.ERROR_MESSAGE);
         }
-        else{
+        else if(!validarFormatoCuit()){
+            JOptionPane.showMessageDialog(this, "El cuit ingresado no es valido", null,JOptionPane.ERROR_MESSAGE);
+        }else if(!validarExistenciaCuit()){
+            JOptionPane.showMessageDialog(this, "El cuit ingresado no se encuentra registrado en la base de datos", null,JOptionPane.ERROR_MESSAGE);
+        }else{
             //Ir a interfaz facturacion
             new Facturacion(null, true, estadia, responsable, hora).setVisible(true);
         }
@@ -178,8 +163,42 @@ public class BusquedaResponsableDePago extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_cancelarBtnActionPerformed
 
-   
+    private Boolean validarFormatoCuit(){
+        Boolean cuitValido = false;
+        if(cuitField.getText().length() != 0){
+                    cuitValido = getInstanceResponsable().validarCUIT(cuitField.getText());
+                  
+                    if(cuitValido){
+                        cuitField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                    }
+                    else{
+                        cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
+                        razonSocialField.setText("");
+                        
+                    }
+                }
+        else{
+            cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
+            razonSocialField.setText("");
+            cuitValido = false;
+        }
+        return cuitValido;
+    }
 
+    private Boolean validarExistenciaCuit(){
+        //Se busca la razon social
+        responsable = getInstanceResponsable().obtenerResponsableDePago(cuitField.getText());
+        if(responsable != null){
+            razonSocialField.setText(responsable.getRazonSocial());
+            return true;
+        }
+        else{
+            cuitField.setBorder(BorderFactory.createLineBorder(Color.RED));
+            razonSocialField.setText("");
+            return false;
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton aceptarBtn;
     private javax.swing.JButton cancelarBtn;

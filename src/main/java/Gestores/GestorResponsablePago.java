@@ -24,6 +24,7 @@ public class GestorResponsablePago {
     }
 
     public Boolean validarCUIT(String cuit) {
+     
         return verificarCUIT(cuit);
     }
     

@@ -116,7 +116,7 @@ public class ArchivoFactura {
             documento.close();
             
             //Abro el archivo generado
-            abrirarchivo("D:/Agustina/tpDisenoSistemas-main"+"/"+"factura-" + f.getIdFactura() + ".pdf");
+            abrirarchivo("C:\\tpDisenoSistemas-main"+"/"+"factura-" + f.getIdFactura() + ".pdf");
             
         } catch (FileNotFoundException ex) {
             ex.printStackTrace(System.out);

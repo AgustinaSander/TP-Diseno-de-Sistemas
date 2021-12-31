@@ -122,8 +122,7 @@ public class GestorEstadias {
         tipoDeHabitacion = new TipoHabitacionDAOImpl().obtenerTipoDeHabitacion(e.getHabitacion().getIdHabitacion());
         
         //Creo la estadiaDTO
-        EstadiaDTO estadia = new EstadiaDTO(e.getIdEstadia(), e.getHabitacion().getIdHabitacion(), e.getFechaIngreso(), e.getFechaEgreso(), tipoDeHabitacion.getPrecio());
-              
+        EstadiaDTO estadia = new EstadiaDTO(e.getIdEstadia(), e.getHabitacion().getIdHabitacion(), e.getFechaIngreso(), e.getFechaEgreso(), tipoDeHabitacion.getPrecio());          
         
         List<PasajeroDTO> listaPasajeros = new ArrayList<>();
         for(OcupadaPor o : e.getListaOcupadaPor()){
@@ -187,19 +186,6 @@ public class GestorEstadias {
             //Obtengo el id del servicio del item y busco el mismo servicio en la lista de servicios
             for(Servicio s : serviciosEstadia){
                 if(s.getIdServicio() == itemServicio.getServicio().getIdServicio()){
-                    
-                    //REVISAR ESTA PARTE
-                    //Me fijo si se facturo toda la cantidad del servicio consumida
-                    /*if(s.getCantidad() > itemServicio.getCantidad()){
-                        //Si no ocurrio actualizo la lista de servicios
-                        s.setCantidad(s.getCantidad() - itemServicio.getCantidad());
-                        s.setPrecioTotal(s.getPrecioTotal() - itemServicio.getCantidad()*itemServicio.getPrecioUnitario());
-                    }
-                    else{
-                        //Si ya se facturo toda la cantidad lo borro de la lista
-                        serviciosEstadia.remove(s);
-                    }
-                    break;*/
                     serviciosEstadia.remove(s);
                     break;
                 }
