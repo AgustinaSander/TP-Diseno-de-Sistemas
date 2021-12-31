@@ -5,6 +5,7 @@ El siguiente proyecto fue realizado en la materia "Diseño de Sistemas" de la Ca
 1. Acerca de la Implementacion
 2. Imagenes de las Interfaces
 3. Etapas del Proyecto
+4. Aclaracion para ejecutar el proyecto
 
 
 ## Acerca de la Implementacion
@@ -76,3 +77,8 @@ El sistema fue realizado en formato escritorio con Java, en el IDE Netbeans. Se 
 <li> <b>Ocupar Habitacion:</b> Se registra una estadia en una habitacion.</li>
 <li> <b>Facturar:</b> Se facturan los servicios consumidos por los pasajeros de la ultima estadia de la habitacion.</li>
 
+## Aclaraciones
+Al correr el codigo debe asegurarse de tener la url de conexion a la base de forma correcta.
+El codigo esta en el paquete Conexion.
+
+Puede que necesite cambiar el numero de puerto de 3307 a 3306.
