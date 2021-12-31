@@ -2,10 +2,10 @@
 El siguiente proyecto fue realizado en la materia "Diseño de Sistemas" de la Carrera de Ingenieria en Sistemas de Informacion de la UTN-FRSF. Trabaje junto a 3 compañeras en su desarrollo durante todo el año 2021.
 
 ## Indice
-1. Acerca de la Implementacion
-2. Imagenes de las Interfaces
-3. Etapas del Proyecto
-4. Aclaracion para ejecutar el proyecto
+1. <a href="#acerca-de-la-implementacion">Acerca de la Implementacion</a>
+2. <a href="#imagenes">Imagenes de las Interfaces</a>
+3. <a href="#etapas-del-proyecto">Etapas del Proyecto</a>
+4. <a href="#aclaraciones">Aclaraciones</a>
 
 
 ## Acerca de la Implementacion
