@@ -1,5 +1,6 @@
 # TP Final - Sistema para Hotel
 El siguiente proyecto fue realizado en la materia "Diseño de Sistemas" de la Carrera de Ingenieria en Sistemas de Informacion de la UTN-FRSF. Trabaje junto a 3 compañeras en su desarrollo durante todo el año 2021.
+Consistia en el desarrollo de un sistema que permita gestionar ocupantes, habitaciones, reservas, ocupaciones, facturas, entre otras cosas de un hotel.
 
 ## Indice
 1. <a href="#acerca-de-la-implementacion">Acerca de la Implementacion</a>
